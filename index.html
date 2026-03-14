@@ -315,6 +315,14 @@
                 <div class="text-gray-400 pl-3 border-l border-gray-600">Total Dmg: <span class="text-orange-400 font-bold float-right" id="char-stat-dmg">0</span></div>
                 <div class="text-gray-400">Total Def: <span class="text-blue-400 font-bold float-right" id="char-stat-def">0</span></div>
                 <div class="text-gray-400 pl-3 border-l border-gray-600">HP Regen: <span class="text-green-300 font-bold float-right" id="char-stat-regen">0</span></div>
+                <div class="text-gray-400">Dodge Chance: <span class="text-purple-400 font-bold float-right" id="char-stat-dodge">0%</span></div>
+                <div class="text-gray-400 pl-3 border-l border-gray-600">Hit Chance: <span class="text-green-400 font-bold float-right" id="char-stat-hit">0%</span></div>
+                <div class="text-gray-400">Crit Chance: <span class="text-yellow-400 font-bold float-right" id="char-stat-crit">5%</span></div>
+                <div class="text-gray-400 pl-3 border-l border-gray-600">Crit Damage: <span class="text-red-400 font-bold float-right" id="char-stat-critdmg">150%</span></div>
+                <div class="text-gray-400">Dmg Reduction: <span class="text-orange-400 font-bold float-right" id="char-stat-dmgred">0%</span></div>
+                <div class="text-gray-400 pl-3 border-l border-gray-600">Dmg Reflect: <span class="text-orange-300 font-bold float-right" id="char-stat-reflect">0%</span></div>
+                <div class="text-gray-400">Skill Dmg: <span class="text-yellow-300 font-bold float-right" id="char-stat-skilldmg">0%</span></div>
+                <div class="text-gray-400 pl-3 border-l border-gray-600">Dmg Mitigation: <span class="text-purple-300 font-bold float-right" id="char-stat-mitigation">0%</span></div>
                 <div class="text-gray-400 col-span-2 text-center mt-1 pt-1 border-t border-gray-700">Gear Score: <span class="text-purple-400 font-bold" id="char-stat-gs">0</span></div>
             </div>
 
@@ -1224,6 +1232,15 @@
             let hpRegenAmt = Math.floor(player.maxHp * (a.hp * 0.0001));
             document.getElementById('char-stat-regen').innerText = `${(player.treeBonusRegen || 0) + hpRegenAmt} HP/Turn`;
             document.getElementById('char-stat-gs').innerText = (eqStats.hp/10 + eqStats.dmg*2 + eqStats.def*5).toFixed(0);
+
+            document.getElementById('char-stat-dodge').innerText = `${(a.resistance * 0.1).toFixed(1)}%`;
+            document.getElementById('char-stat-hit').innerText = `${(a.reflexes * 0.1).toFixed(1)}%`;
+            document.getElementById('char-stat-crit').innerText = `${Math.min(75, 5 + (a.reflexes * 1)).toFixed(0)}%`;
+            document.getElementById('char-stat-critdmg').innerText = `${(150 + (a.fury * 1)).toFixed(0)}%`;
+            document.getElementById('char-stat-dmgred').innerText = `${(a.tenacity * 0.1).toFixed(1)}%`;
+            document.getElementById('char-stat-reflect').innerText = `${(a.tenacity * 0.01).toFixed(2)}%`;
+            document.getElementById('char-stat-skilldmg').innerText = `${(a.agility * 0.1).toFixed(1)}%`;
+            document.getElementById('char-stat-mitigation').innerText = `${Math.min(70, a.resistance * 0.1).toFixed(1)}%`;
             
             const pClass = document.getElementById('char-class-name'); if(pClass) pClass.innerText = player.data.name;
             const pAv = document.getElementById('char-avatar-display'); if(pAv) pAv.innerText = player.data.avatar;
