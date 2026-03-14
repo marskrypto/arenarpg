@@ -1286,6 +1286,9 @@
             player.maxHp = calculateMaxHp(); if(player.currentHp > player.maxHp) player.currentHp = player.maxHp;
             player.regenBuffs = []; player.activeBuffs = []; player.skillCooldowns = {};
             player.stunned = 0; player.bleedStacks = 0; player.bleedTurns = 0; player.dodgeTurns = 0;
+            // Close hero dropdown if open
+            let heroMenu = document.getElementById('hub-hero-menu');
+            if(heroMenu) heroMenu.classList.add('hidden');
 
             document.getElementById('hub-gold').innerText = globalProgression.gold;
             document.getElementById('hub-tickets').innerText = globalProgression.tickets || 0;
@@ -1300,7 +1303,6 @@
             if(document.getElementById('hub-hero-bar-gold')) document.getElementById('hub-hero-bar-gold').innerText = globalProgression.gold;
             // Sync hero menu notification badges
             if(document.getElementById('hub-attr-noti-hero')) document.getElementById('hub-attr-noti-hero').classList.toggle('hidden', player.statPoints <= 0);
-            if(document.getElementById('hub-char-noti-hero')) document.getElementById('hub-char-noti-hero').classList.toggle('hidden', !hasBetterGear(null));
             if(document.getElementById('hub-skill-noti-hero')) document.getElementById('hub-skill-noti-hero').classList.toggle('hidden', player.skillPoints <= 0);
             
             let hasUnequippedBetter = EQUIP_SLOTS.some(slot => hasBetterGear(slot));
