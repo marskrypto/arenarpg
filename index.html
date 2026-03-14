@@ -45,6 +45,13 @@
         @keyframes anim-epic-glow { 0%, 100% { filter: drop-shadow(0 0 5px #c084fc); transform: scale(1); } 50% { filter: drop-shadow(0 0 15px #a855f7); transform: scale(1.05); } }
         @keyframes anim-legendary-pulse { 0%, 100% { filter: drop-shadow(0 0 10px #fbbf24) hue-rotate(0deg); transform: scale(1) translateY(0); } 50% { filter: drop-shadow(0 0 25px #f59e0b) hue-rotate(15deg); transform: scale(1.1) translateY(-5px); } }
 
+        @keyframes herb-grow { 0% { opacity:0; transform:scale(0.2) translateY(20px); } 30% { opacity:1; transform:scale(1.2) translateY(-10px); } 60% { transform:scale(0.9) translateY(0); } 80% { transform:scale(1.1) translateY(-5px); } 100% { opacity:1; transform:scale(1) translateY(0); } }
+        @keyframes fish-cast { 0% { opacity:0; transform:translateX(-30px) rotate(-20deg); } 40% { opacity:1; transform:translateX(10px) rotate(10deg); } 70% { transform:translateX(-5px) rotate(-5deg); } 100% { opacity:1; transform:translateX(0) rotate(0deg); } }
+        @keyframes gather-bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+        .gather-anim-overlay { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:999; pointer-events:none; display:flex; flex-direction:column; align-items:center; gap:8px; }
+        .gather-emoji { font-size:3rem; animation: gather-bounce 0.5s ease-in-out infinite; }
+        .gather-label { color:white; font-size:1rem; font-weight:bold; text-shadow:0 0 10px rgba(0,0,0,0.8); background:rgba(0,0,0,0.7); padding:4px 12px; border-radius:999px; }
+
         .anim-strike { animation: anim-strike 0.5s ease-out; z-index: 50; position: relative; }
         .anim-shake { animation: anim-shake 0.5s ease-in-out; }
         .anim-heal { animation: anim-heal 0.8s ease-out; }
@@ -135,7 +142,7 @@
     <div id="screen-hub" class="screen py-6">
         <div class="w-full max-w-2xl px-4 flex flex-col items-center">
             
-            <!-- Top Status Bar -->
+            <!-- Top Status Bar (not clickable) -->
             <div class="flex justify-between items-center w-full bg-gray-800 p-3 rounded-xl shadow-lg border border-gray-700 mb-4">
                 <div class="flex items-center gap-3">
                     <div class="text-3xl" id="hub-avatar">🗡️</div>
@@ -165,39 +172,65 @@
             <div id="hub-level-up-noti" class="w-full bg-green-900 border border-green-500 text-green-300 p-3 rounded-lg text-center font-bold mb-4 hidden cursor-pointer shadow-lg animate-pulse" onclick="showAttributes()">
                 ✨ You leveled up! Spend your Attribute Points! ✨
             </div>
+
+            <!-- Town Title -->
+            <div class="w-full text-center mb-4">
+                <h2 class="text-2xl font-black text-yellow-300 tracking-widest drop-shadow-lg">⛺ Town</h2>
+            </div>
             
+            <!-- Adventure Hunt Button -->
             <div class="w-full mb-4">
                 <button onclick="showStoryMode()" title="Explore the world, gather resources, and hunt various enemies!" class="w-full bg-indigo-700 hover:bg-indigo-600 border border-indigo-500 py-4 rounded-xl font-bold text-xl shadow-[0_0_15px_rgba(79,70,229,0.5)] transition active:scale-95 flex justify-center items-center gap-2">
                     📖 Adventure Hunt
                 </button>
             </div>
 
+            <!-- Clickable Hero Bar (opens Attributes/Character/SkillTree dropdown) -->
+            <div class="w-full mb-4 relative">
+                <button onclick="toggleHeroMenu()" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-600 px-4 py-3 rounded-xl font-bold text-sm text-white flex justify-between items-center transition active:scale-95 shadow-md">
+                    <span class="text-blue-300 font-bold">
+                        <span id="hub-hero-bar-class">Warrior</span> Lvl <span id="hub-hero-bar-lvl">1</span>
+                    </span>
+                    <span class="text-yellow-400 font-bold">💰 <span id="hub-hero-bar-gold">0</span> G</span>
+                    <span class="text-gray-400 text-xs">▼ Stats</span>
+                </button>
+                <div id="hub-hero-menu" class="hidden absolute left-0 right-0 z-20 bg-gray-900 border border-gray-600 rounded-xl shadow-2xl overflow-hidden mt-1">
+                    <button onclick="showAttributes(); toggleHeroMenu();" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition border-b border-gray-700">
+                        <span class="text-xl">💪</span>
+                        <div class="text-left">
+                            <div class="font-bold text-green-400">Attributes</div>
+                            <div class="text-[10px] text-gray-400">Spend attribute points</div>
+                        </div>
+                        <span id="hub-attr-noti-hero" class="hidden ml-auto bg-green-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center animate-bounce font-bold shadow-lg">!</span>
+                    </button>
+                    <button onclick="showCharacter(); toggleHeroMenu();" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition border-b border-gray-700">
+                        <span class="text-xl">🛡️</span>
+                        <div class="text-left">
+                            <div class="font-bold text-blue-400">Character</div>
+                            <div class="text-[10px] text-gray-400">Stats, skills & equipment</div>
+                        </div>
+                        <span id="hub-char-noti-hero" class="hidden ml-auto bg-red-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center animate-bounce font-bold shadow-lg">!</span>
+                    </button>
+                    <button onclick="showSkillTree(); toggleHeroMenu();" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition">
+                        <span class="text-xl">🌳</span>
+                        <div class="text-left">
+                            <div class="font-bold text-purple-400">Skill Tree</div>
+                            <div class="text-[10px] text-gray-400">Unlock abilities & passives</div>
+                        </div>
+                        <span id="hub-skill-noti-hero" class="hidden ml-auto bg-purple-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center animate-pulse">!</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Grid -->
             <div class="grid grid-cols-3 gap-2 w-full mb-6">
                 <button onclick="showQuests()" title="Complete objectives for Gold rewards" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center"><span class="text-2xl mb-1">📜</span><span class="font-bold text-yellow-400 text-xs">Quests</span></button>
                 <button onclick="showDungeons()" title="Survive 5 difficult waves for guaranteed Rare gear" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center"><span class="text-2xl mb-1">🌌</span><span class="font-bold text-red-400 text-xs text-center">Dungeon<br>Portal</span></button>
                 <button onclick="showGraveyard()" title="Resurrect and fight defeated Bosses" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center"><span class="text-2xl mb-1">🪦</span><span class="font-bold text-gray-400 text-xs">Graveyard</span></button>
-
-                <button onclick="showShop()" title="Buy Daily Gear & Sell Materials" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center"><span class="text-2xl mb-1">🛒</span><span class="font-bold text-gray-300 text-xs">Shop</span></button>
-                <button onclick="showEnchanter()" title="Upgrade equipped gear using Enchanting Cores" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center"><span class="text-2xl mb-1">✨</span><span class="font-bold text-purple-400 text-xs">Enchanter</span></button>
-                <button onclick="showAlchemist()" title="Craft healing potions from Herbs" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center"><span class="text-2xl mb-1">⚗️</span><span class="font-bold text-green-400 text-xs">Alchemist</span></button>
                 
-                <button onclick="showChef()" title="Cook stat-boosting food using Fish" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center"><span class="text-2xl mb-1">👨‍🍳</span><span class="font-bold text-orange-400 text-xs">Chef</span></button>
+                <button onclick="showMerchants()" title="Visit merchants for gear, enchants, potions and food" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center"><span class="text-2xl mb-1">🏪</span><span class="font-bold text-amber-400 text-xs">Merchants</span></button>
                 <button onclick="showWell()" title="Restore yourself and buy temporary blessings" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center"><span class="text-2xl mb-1">⛲</span><span class="font-bold text-cyan-300 text-xs">Well</span></button>
                 <button onclick="showInventory()" title="View your gathered items, potions, and raw equipment" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center"><span class="text-2xl mb-1">🧳</span><span class="font-bold text-orange-300 text-xs">Bag</span></button>
-                <button onclick="showAttributes()" title="Spend Attribute Points" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center relative">
-                    <span class="text-2xl mb-1 relative">💪<span id="hub-attr-noti" class="hidden absolute -top-2 -right-3 bg-green-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center animate-bounce font-bold shadow-lg">!</span></span>
-                    <span class="font-bold text-green-400 text-xs">Attributes</span>
-                </button>
-                
-                <button onclick="showCharacter()" title="Manage stats, skills, and equipment" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center relative">
-                    <span class="text-2xl mb-1 relative">🛡️<span id="hub-char-noti" class="hidden absolute -top-2 -right-3 bg-red-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center animate-bounce font-bold shadow-lg">!</span></span>
-                    <span class="font-bold text-blue-400 text-xs">Character</span>
-                </button>
-
-                <button onclick="showSkillTree()" title="Unlock new abilities and passive stats" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center relative">
-                    <span class="text-2xl mb-1 relative">🌳<span id="hub-skill-noti" class="hidden absolute -top-2 -right-3 bg-purple-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center animate-pulse">!</span></span>
-                    <span class="font-bold text-purple-400 text-xs">Skill Tree</span>
-                </button>
 
                 <button onclick="showSettings()" title="Game Settings" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center">
                     <span class="text-2xl mb-1">⚙️</span><span class="font-bold text-gray-400 text-xs">Settings</span>
@@ -211,6 +244,37 @@
                 <button onclick="changeClass()" class="bg-gray-800 p-3 rounded-xl border border-gray-700 hover:bg-gray-700 flex flex-col items-center">
                     <span class="text-2xl mb-1">🔄</span>
                     <span class="font-bold text-cyan-400 text-xs">Change Class</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MERCHANTS SUBMENU -->
+    <div id="screen-merchants" class="screen py-8">
+        <div class="w-full max-w-xl px-4 flex flex-col h-full">
+            <button onclick="showHub()" class="btn-back self-start mb-6 text-amber-400 px-4 py-2 rounded-lg font-bold flex items-center gap-2"><span>⬅️</span> Town</button>
+            <h2 class="text-3xl font-bold mb-2 text-amber-400 text-center tracking-widest drop-shadow-md">🏪 MERCHANTS</h2>
+            <p class="text-xs text-gray-400 text-center mb-6">Visit the town's merchants for gear, crafting, and more.</p>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="showShop()" class="bg-gray-800 hover:bg-gray-700 border border-gray-600 p-5 rounded-xl flex flex-col items-center transition active:scale-95 shadow-lg">
+                    <span class="text-4xl mb-2">🛒</span>
+                    <span class="font-bold text-white text-sm">Shop</span>
+                    <span class="text-[10px] text-gray-400 mt-1 text-center">Buy gear & sell materials</span>
+                </button>
+                <button onclick="showEnchanter()" class="bg-gray-800 hover:bg-gray-700 border border-gray-600 p-5 rounded-xl flex flex-col items-center transition active:scale-95 shadow-lg">
+                    <span class="text-4xl mb-2">✨</span>
+                    <span class="font-bold text-purple-400 text-sm">Enchanter</span>
+                    <span class="text-[10px] text-gray-400 mt-1 text-center">Upgrade equipped gear</span>
+                </button>
+                <button onclick="showAlchemist()" class="bg-gray-800 hover:bg-gray-700 border border-gray-600 p-5 rounded-xl flex flex-col items-center transition active:scale-95 shadow-lg">
+                    <span class="text-4xl mb-2">⚗️</span>
+                    <span class="font-bold text-green-400 text-sm">Alchemist</span>
+                    <span class="text-[10px] text-gray-400 mt-1 text-center">Craft healing potions</span>
+                </button>
+                <button onclick="showChef()" class="bg-gray-800 hover:bg-gray-700 border border-gray-600 p-5 rounded-xl flex flex-col items-center transition active:scale-95 shadow-lg">
+                    <span class="text-4xl mb-2">👨‍🍳</span>
+                    <span class="font-bold text-orange-400 text-sm">Chef</span>
+                    <span class="text-[10px] text-gray-400 mt-1 text-center">Cook combat food buffs</span>
                 </button>
             </div>
         </div>
@@ -233,7 +297,7 @@
             <div class="bg-gray-800 border border-gray-700 rounded-xl p-4 mb-4 shadow-lg flex justify-between items-center">
                 <div>
                     <h3 class="font-bold text-white text-lg">Music</h3>
-                    <p class="text-xs text-gray-400">Epic Boss Encounter Themes.</p>
+                    <p class="text-xs text-gray-400">Boss Music (plays during boss fights).</p>
                 </div>
                 <button id="toggle-music-btn" onclick="toggleSetting('music')" class="px-6 py-2 rounded font-bold text-white transition active:scale-95">ON</button>
             </div>
@@ -499,6 +563,8 @@
                     <!-- Javascript Populated Columns -->
                 </div>
             </div>
+
+            <div id="skill-tree-enhancements" class="w-full mt-4"></div>
 
         </div>
     </div>
@@ -803,14 +869,14 @@
 
         // BOSS & BATTLE MUSIC SYSTEM
 
-        // Boss Song 1: Dark ambient - deep bass drone with slow sine melody
+        // Boss Song 1: Dark ambient - deep bass drone with slow sine melody (loops)
         function playBossSong1() {
             if(!globalProgression.settings.music) return;
             stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
             const now = audioCtx.currentTime;
             // Bass drone
             const bass = audioCtx.createOscillator(); const bassGain = audioCtx.createGain();
-            bass.type = 'sine'; bass.frequency.value = 65.41; // C2
+            bass.type = 'sine'; bass.frequency.value = 65.41;
             bass.connect(bassGain); bassGain.connect(audioCtx.destination);
             bassGain.gain.setValueAtTime(0, now); bassGain.gain.linearRampToValueAtTime(0.04, now + 3);
             bass.start(now); activeOscillators.push({osc: bass, gain: bassGain});
@@ -822,9 +888,11 @@
             mel.connect(melGain); melGain.connect(audioCtx.destination);
             melGain.gain.setValueAtTime(0, now); melGain.gain.linearRampToValueAtTime(0.025, now + 4);
             mel.start(now); activeOscillators.push({osc: mel, gain: melGain});
+            const totalDur = melody.reduce((s, [f,d]) => s+d, 0);
+            setTimeout(() => { if(globalProgression.settings.music && activeOscillators.length > 0) playBossSong1(); }, totalDur * 1000);
         }
 
-        // Boss Song 2: Ethereal - triangle waves, minor pentatonic, slow
+        // Boss Song 2: Ethereal - triangle waves, minor pentatonic, slow (loops)
         function playBossSong2() {
             if(!globalProgression.settings.music) return;
             stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
@@ -836,170 +904,17 @@
             osc.connect(gain); gain.connect(audioCtx.destination);
             gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.035, now + 3);
             osc.start(now); activeOscillators.push({osc, gain});
-        }
-
-        // Boss Song 3: Mysterious - detuned dual oscillators, whole tone scale
-        function playBossSong3() {
-            if(!globalProgression.settings.music) return;
-            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
-            const now = audioCtx.currentTime;
-            [0, 1.5].forEach(detune => {
-                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-                osc.type = 'sine'; osc.detune.value = detune * 15;
-                const whole = [[261.63,4],[293.66,4],[329.63,4],[369.99,4],[415.3,4],[466.16,4],[415.3,4],[369.99,4],[329.63,4],[293.66,4],[261.63,4],[233.08,4],[261.63,4],[293.66,4],[369.99,4],[466.16,4],[369.99,4],[261.63,8]];
-                let t = now; whole.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.02, now + 3);
-                osc.start(now); activeOscillators.push({osc, gain});
-            });
-        }
-
-        // Boss Song 4: Intense chill - sawtooth filtered power chords
-        function playBossSong4() {
-            if(!globalProgression.settings.music) return;
-            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
-            const now = audioCtx.currentTime;
-            const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 600; filter.connect(audioCtx.destination);
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            const pat = [[110,3],[130.81,3],[98,3],[110,3],[87.31,3],[98,3],[110,6],[130.81,3],[146.83,3],[130.81,3],[110,3],[98,6],[110,3],[130.81,3],[155.56,3],[174.61,3],[155.56,3],[130.81,3],[110,6]];
-            let t = now; pat.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
-            osc.connect(gain); gain.connect(filter);
-            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.025, now + 2);
-            osc.start(now); activeOscillators.push({osc, gain});
-        }
-
-        // Boss Song 5: Haunting - sine with vibrato, Dorian mode
-        function playBossSong5() {
-            if(!globalProgression.settings.music) return;
-            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            const lfo = audioCtx.createOscillator(); const lfoGain = audioCtx.createGain();
-            lfo.type = 'sine'; lfo.frequency.value = 5; lfoGain.gain.value = 8;
-            lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
-            osc.type = 'sine';
-            // Dorian mode on D: D E F G A B C D
-            const dorian = [[146.83,4],[164.81,4],[174.61,4],[196,4],[220,4],[246.94,4],[261.63,4],[293.66,4],[261.63,4],[246.94,4],[220,4],[196,4],[174.61,4],[164.81,4],[146.83,4],[130.81,4],[146.83,4],[164.81,4],[196,4],[220,4],[246.94,4],[220,4],[196,4],[146.83,8]];
-            let t = now; dorian.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.03, now + 3);
-            osc.start(now); lfo.start(now);
-            activeOscillators.push({osc, lfo, gain});
-        }
-
-        // Battle Song 1: Rhythmic pulse - Aeolian alternating bass
-        function playBattleSong1() {
-            if(!globalProgression.settings.music) return;
-            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = 'triangle';
-            const aeolian = [[220,1.5],[196,1.5],[220,1.5],[261.63,1.5],[246.94,1.5],[220,1.5],[196,1.5],[174.61,1.5],[196,1.5],[220,1.5],[246.94,1.5],[261.63,1.5],[293.66,1.5],[261.63,1.5],[246.94,1.5],[220,3],[220,1.5],[196,1.5],[220,1.5],[246.94,1.5],[261.63,1.5],[293.66,1.5],[349.23,1.5],[329.63,1.5],[293.66,1.5],[261.63,1.5],[246.94,1.5],[220,3]];
-            let t = now; aeolian.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.04, now + 1.5);
-            osc.start(now); activeOscillators.push({osc, gain});
-        }
-
-        // Battle Song 2: Driving triangle, minor scale runs
-        function playBattleSong2() {
-            if(!globalProgression.settings.music) return;
-            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = 'triangle';
-            const minor = [[261.63,1],[293.66,1],[311.13,1],[349.23,1],[392,1],[415.3,1],[392,1],[349.23,1],[311.13,1],[293.66,1],[261.63,1],[246.94,1],[261.63,1],[293.66,1],[349.23,1],[392,1],[440,1],[415.3,1],[392,1],[349.23,1],[311.13,1],[261.63,2],[293.66,1],[329.63,1],[349.23,1],[392,1],[440,1],[493.88,1],[440,1],[392,1],[349.23,1],[293.66,1],[261.63,2]];
-            let t = now; minor.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.04, now + 1.5);
-            osc.start(now); activeOscillators.push({osc, gain});
-        }
-
-        // Battle Song 3: Percussive staccato, pentatonic
-        function playBattleSong3() {
-            if(!globalProgression.settings.music) return;
-            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = 'square';
-            const penta = [[293.66,0.8],[0.1,0.2],[349.23,0.8],[0.1,0.2],[392,0.8],[0.1,0.2],[440,0.8],[0.1,0.2],[523.25,0.8],[0.1,0.2],[440,0.8],[0.1,0.2],[392,0.8],[0.1,0.2],[349.23,0.8],[0.1,0.2],[293.66,0.8],[0.1,0.4],[261.63,0.8],[0.1,0.2],[293.66,0.8],[0.1,0.2],[349.23,0.8],[0.1,0.2],[392,0.8],[0.1,0.2],[440,0.8],[0.1,0.2],[523.25,0.8],[0.1,0.2],[587.33,0.8],[0.1,0.2],[523.25,0.8],[0.1,0.4],[440,1.6]];
-            let t = now; penta.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.025, now + 1);
-            osc.start(now); activeOscillators.push({osc, gain});
-        }
-
-        // Battle Song 4: Flowing Phrygian melody
-        function playBattleSong4() {
-            if(!globalProgression.settings.music) return;
-            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            // Phrygian on E: E F G A B C D E
-            const phryg = [[329.63,1.2],[349.23,1.2],[392,1.2],[440,1.2],[493.88,1.2],[523.25,1.2],[587.33,1.2],[659.25,1.2],[587.33,1.2],[523.25,1.2],[493.88,1.2],[440,1.2],[392,1.2],[349.23,1.2],[329.63,2.4],[329.63,1.2],[392,1.2],[440,1.2],[493.88,1.2],[587.33,1.2],[659.25,1.2],[587.33,1.2],[493.88,1.2],[440,1.2],[392,1.2],[329.63,2.4]];
-            let t = now; phryg.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.04, now + 1.5);
-            osc.start(now); activeOscillators.push({osc, gain});
-        }
-
-        // Battle Song 5: Energetic arpeggios, harmonic minor
-        function playBattleSong5() {
-            if(!globalProgression.settings.music) return;
-            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            // Harmonic minor arpeggios on A
-            const hMin = [[220,0.6],[261.63,0.6],[329.63,0.6],[415.3,0.6],[329.63,0.6],[261.63,0.6],[220,0.6],[196,0.6],[220,0.6],[261.63,0.6],[329.63,0.6],[440,0.6],[329.63,0.6],[261.63,0.6],[220,1.2],[246.94,0.6],[293.66,0.6],[369.99,0.6],[493.88,0.6],[369.99,0.6],[293.66,0.6],[246.94,0.6],[220,0.6],[246.94,0.6],[293.66,0.6],[369.99,0.6],[440,0.6],[369.99,0.6],[293.66,0.6],[220,1.2]];
-            let t = now; hMin.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.04, now + 1);
-            osc.start(now); activeOscillators.push({osc, gain});
-        }
-
-        // Menu Music: Very chill ambient pad, major pentatonic, very slow & low volume
-        function playMenuMusic() {
-            if(!globalProgression.settings || !globalProgression.settings.music) return;
-            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            const lfo = audioCtx.createOscillator(); const lfoGain = audioCtx.createGain();
-            lfo.type = 'sine'; lfo.frequency.value = 0.3; lfoGain.gain.value = 3;
-            lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
-            osc.type = 'sine';
-            // Major pentatonic, very slow (5-7s per note)
-            const pentatonicMenu = [[261.63,6],[293.66,5],[329.63,6],[392,7],[440,5],[392,6],[329.63,7],[293.66,5],[261.63,6],[220,7],[261.63,5],[293.66,6],[329.63,7],[392,5],[440,6],[493.88,7],[440,5],[392,6],[329.63,7],[261.63,8]];
-            let t = now; pentatonicMenu.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.018, now + 4);
-            osc.start(now); lfo.start(now);
-            activeOscillators.push({osc, lfo, gain});
+            const totalDur = penta.reduce((s, [f,d]) => s+d, 0);
+            setTimeout(() => { if(globalProgression.settings.music && activeOscillators.length > 0) playBossSong2(); }, totalDur * 1000);
         }
 
         function playBossMusic() {
-            const pick = Math.floor(Math.random() * 5) + 1;
+            const pick = Math.floor(Math.random() * 2) + 1;
             if(pick === 1) playBossSong1();
-            else if(pick === 2) playBossSong2();
-            else if(pick === 3) playBossSong3();
-            else if(pick === 4) playBossSong4();
-            else playBossSong5();
+            else playBossSong2();
         }
 
-        function playBattleMusic() {
-            const pick = Math.floor(Math.random() * 5) + 1;
-            if(pick === 1) playBattleSong1();
-            else if(pick === 2) playBattleSong2();
-            else if(pick === 3) playBattleSong3();
-            else if(pick === 4) playBattleSong4();
-            else playBattleSong5();
-        }
-
-        function playSongA() { playBossMusic(); }
-        function playSongB() { playBattleMusic(); }
-        function playSongC() { playBattleMusic(); }
+        function playBattleMusic() { /* no music for regular battles */ }
 
         function stopMusic() {
             activeOscillators.forEach(o => {
@@ -1147,10 +1062,9 @@
             attributes: { hp: 1, tenacity: 1, agility: 1, willpower: 1, resistance: 1, reflexes: 1, fury: 1, devastation: 0 },
             storyModeProgress: { hunting: 0, pillage: 0, workshop: 0 },
             settings: { sound: true, music: true },
-            discoveredEnemies: {}, claimedCodexRewards: {}, killedBosses: {}
+            discoveredEnemies: {}, claimedCodexRewards: {}, killedBosses: {},
+            skillTreeEnhancements: []
         };
-
-        // Skill Tree Pre-Generation
         const TREE_NODES = [];
         const skillUnlockNodes = [5, 10, 15, 20, 25, 35, 47];
         const regenNodes = [8, 18, 28, 38, 46];
@@ -1171,7 +1085,8 @@
             treeProgressFire: 0, treeProgressIce: 0, treeProgressOffense: 0, treeProgressDefense: 0,
             skillPoints: 0, unlockedSkills: [0, 1, 2], equippedSkills: [0, 1, 2, null, null], 
             skillCooldowns: {}, regenBuffs: [], activeBuffs: [],
-            stunned: 0, bleedStacks: 0, bleedTurns: 0, dodgeTurns: 0
+            stunned: 0, bleedStacks: 0, bleedTurns: 0, dodgeTurns: 0,
+            wayOfHeavensCooldown: 0, rageUsed: false, rageActive: 0, divineShieldUsed: false, reflectUsed: false
         };
 
         let enemies = []; let activeTargetIndex = 0; let currentMode = 'none'; 
@@ -1260,6 +1175,8 @@
                 if(globalProgression.enemyKillCounts === undefined) globalProgression.enemyKillCounts = {};
                 if(globalProgression.claimedCodexMilestones === undefined) globalProgression.claimedCodexMilestones = {};
                 if(!player.equippedUsables) player.equippedUsables = [null, null, null, null, null, null, null, null];
+                if(globalProgression.skillTreeEnhancements === undefined) globalProgression.skillTreeEnhancements = [];
+                if(player.wayOfHeavensCooldown === undefined) player.wayOfHeavensCooldown = 0;
 
                 if (globalProgression.lastQuestDate !== new Date().toDateString()) {
                     globalProgression.questsCompletedToday = 0;
@@ -1319,13 +1236,21 @@
         function calculateMaxHp() {
             let equipStats = getEquipStats();
             let a = globalProgression.attributes;
-            return player.data.baseHp + ((player.lvl - 1) * 15) + (a.hp * 12) + (a.tenacity * 2) + (a.agility * 2) + (a.resistance * 2) + player.treeBonusHp + equipStats.hp;
+            let base = player.data.baseHp + ((player.lvl - 1) * 15) + (a.hp * 12) + (a.tenacity * 2) + (a.agility * 2) + (a.resistance * 2) + player.treeBonusHp + equipStats.hp;
+            // Apply HP Boost enhancements
+            let hpBoostMult = 1;
+            (globalProgression.skillTreeEnhancements || []).forEach(enh => {
+                if(enh.type === 'hpBoost') {
+                    hpBoostMult += ENHANCEMENT_DEFS.hpBoost.vals[enh.rarity];
+                }
+            });
+            return Math.floor(base * hpBoostMult);
         }
 
         function getBaseDamage() {
             let equipStats = getEquipStats();
             let a = globalProgression.attributes;
-            return player.data.baseDmg + (a.willpower * 3) + (a.agility * 1) + (a.reflexes * 1) + player.treeBonusDmg + equipStats.dmg;
+            return player.data.baseDmg + (a.willpower * 2) + (a.agility * 1) + (a.reflexes * 1) + player.treeBonusDmg + equipStats.dmg;
         }
         
         function getPlayerDef() {
@@ -1340,7 +1265,14 @@
             if (targetScreen) targetScreen.classList.add('active-screen');
         }
 
-        function showMenu() { stopMusic(); switchScreen('screen-menu'); setTimeout(playMenuMusic, 1100); /* 1100ms: allows stopMusic() 1s fade-out to complete */ }
+        function showMerchants() { switchScreen('screen-merchants'); }
+
+        function toggleHeroMenu() {
+            const menu = document.getElementById('hub-hero-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function showMenu() { stopMusic(); switchScreen('screen-menu'); }
         function showClassSelect() { switchScreen('screen-class-select'); }
         
         function changeClass() {
@@ -1354,6 +1286,9 @@
             player.maxHp = calculateMaxHp(); if(player.currentHp > player.maxHp) player.currentHp = player.maxHp;
             player.regenBuffs = []; player.activeBuffs = []; player.skillCooldowns = {};
             player.stunned = 0; player.bleedStacks = 0; player.bleedTurns = 0; player.dodgeTurns = 0;
+            // Close hero dropdown if open
+            let heroMenu = document.getElementById('hub-hero-menu');
+            if(heroMenu) heroMenu.classList.add('hidden');
 
             document.getElementById('hub-gold').innerText = globalProgression.gold;
             document.getElementById('hub-tickets').innerText = globalProgression.tickets || 0;
@@ -1361,13 +1296,17 @@
             document.getElementById('hub-class').innerText = player.data.name;
             document.getElementById('hub-avatar').innerText = player.data.avatar;
             document.getElementById('hub-level-up-noti').classList.toggle('hidden', player.statPoints <= 0);
-            document.getElementById('hub-skill-noti').classList.toggle('hidden', player.skillPoints <= 0);
+
+            // Sync hero bar
+            if(document.getElementById('hub-hero-bar-class')) document.getElementById('hub-hero-bar-class').innerText = player.data.name;
+            if(document.getElementById('hub-hero-bar-lvl')) document.getElementById('hub-hero-bar-lvl').innerText = player.lvl;
+            if(document.getElementById('hub-hero-bar-gold')) document.getElementById('hub-hero-bar-gold').innerText = globalProgression.gold;
+            // Sync hero menu notification badges
+            if(document.getElementById('hub-attr-noti-hero')) document.getElementById('hub-attr-noti-hero').classList.toggle('hidden', player.statPoints <= 0);
+            if(document.getElementById('hub-skill-noti-hero')) document.getElementById('hub-skill-noti-hero').classList.toggle('hidden', player.skillPoints <= 0);
             
             let hasUnequippedBetter = EQUIP_SLOTS.some(slot => hasBetterGear(slot));
-            document.getElementById('hub-char-noti').classList.toggle('hidden', !hasUnequippedBetter);
-            
-            let attrNoti = document.getElementById('hub-attr-noti');
-            if(attrNoti) attrNoti.classList.toggle('hidden', player.statPoints <= 0);
+            if(document.getElementById('hub-char-noti-hero')) document.getElementById('hub-char-noti-hero').classList.toggle('hidden', !hasUnequippedBetter);
 
             // Sync codex checks to base names
             let allM = [...ENEMIES_HUNT, ...ENEMIES_PILLAGE, ...ENEMIES_WORKSHOP, ...ENEMIES_DUNGEON];
@@ -1402,14 +1341,16 @@
                 shopGear: [], shopLastRefresh: 0, attributes: { hp: 1, tenacity: 1, agility: 1, willpower: 1, resistance: 1, reflexes: 1, fury: 1, devastation: 0 },
                 storyModeProgress: { hunting: 0, pillage: 0, workshop: 0 },
                 settings: { sound: true, music: true },
-                discoveredEnemies: {}, claimedCodexRewards: {}, killedBosses: {}
+                discoveredEnemies: {}, claimedCodexRewards: {}, killedBosses: {},
+                skillTreeEnhancements: []
             };
             player = {
                 classId: classId, data: CLASSES[classId], lvl: 1, xp: 0, maxHp: 0, currentHp: 0, shield: 0, 
                 statPoints: 0, skillPoints: 0, treeProgress: 0, treeBonusHp: 0, treeBonusDmg: 0, treeBonusDef: 0, treeBonusRegen: 0,
                 treeProgressFire: 0, treeProgressIce: 0, treeProgressOffense: 0, treeProgressDefense: 0,
                 unlockedSkills: [0, 1, 2], equippedSkills: [0, 1, 2, null, null], skillCooldowns: {}, regenBuffs: [], activeBuffs: [], stunned: 0, bleedStacks: 0, bleedTurns: 0, dodgeTurns: 0,
-                equippedUsables: [null, null, null, null, null, null, null, null]
+                equippedUsables: [null, null, null, null, null, null, null, null],
+                wayOfHeavensCooldown: 0, rageUsed: false, rageActive: 0, divineShieldUsed: false, reflectUsed: false
             };
             player.maxHp = calculateMaxHp(); player.currentHp = player.maxHp; 
             saveGame(); showHub();
@@ -1504,31 +1445,70 @@
         }
 
         function gatherAction(type) {
-            if(!consumeEnergy(1)) return; 
-            globalProgression.cooldowns[type] = Date.now() + (10 * 60 * 1000); 
-            let log = document.getElementById('story-log'); playSound('heal'); 
+            if(!consumeEnergy(1)) return;
             
-            // Gold & XP gains
-            let xpGain = Math.floor(getXpForNextLevel(player.lvl) * 0.10);
-            globalProgression.gold += 5;
-            player.xp += xpGain;
-
-            showFloatText(`btn-gather-${type}`, `+${xpGain} XP`, 'text-yellow-400');
-
+            // Show animation overlay
+            let overlay = document.createElement('div');
+            overlay.className = 'gather-anim-overlay';
+            overlay.id = 'gather-overlay';
+            
             if(type === 'herbs') {
-                let r1 = Math.floor(Math.random()*3)+1; let r2 = Math.floor(Math.random()*3)+1;
-                globalProgression.inventory.herb_red += r1; globalProgression.inventory.herb_blue += r2;
-                log.innerHTML = `<span class="text-green-400">Gathered ${r1} Crimson & ${r2} Azure Herbs! (+5G, +${xpGain}XP)</span>`;
-            } else if (type === 'fish') {
-                let types = [1,2,3,4,5,6];
-                let pick1 = types.splice(Math.floor(Math.random()*types.length), 1)[0]; let pick2 = types.splice(Math.floor(Math.random()*types.length), 1)[0];
-                let a1 = Math.floor(Math.random()*2)+1; let a2 = Math.floor(Math.random()*2)+1;
-                globalProgression.inventory[`fish_${pick1}`] += a1; globalProgression.inventory[`fish_${pick2}`] += a2;
-                log.innerHTML = `<span class="text-blue-400">Caught ${a1} ${MAT_NAMES['fish_'+pick1]} & ${a2} ${MAT_NAMES['fish_'+pick2]}! (+5G, +${xpGain}XP)</span>`;
+                overlay.innerHTML = `
+                    <div class="gather-emoji" style="animation-delay:0s">🌱</div>
+                    <div class="gather-emoji" style="animation-delay:0.3s; animation: herb-grow 1s ease forwards, gather-bounce 0.5s 1s infinite">🌿</div>
+                    <div class="gather-emoji" style="animation-delay:1.5s; animation: herb-grow 1s 1.5s ease forwards, gather-bounce 0.5s 2.5s infinite; opacity:0">🌺</div>
+                    <div class="gather-label">Foraging herbs...</div>
+                `;
+            } else {
+                overlay.innerHTML = `
+                    <div class="gather-emoji" style="animation-delay:0s">🎣</div>
+                    <div class="gather-emoji" style="animation: fish-cast 0.8s 0.8s ease forwards; opacity:0">🐟</div>
+                    <div class="gather-emoji" style="animation: gather-bounce 0.3s 1.6s ease infinite; opacity:1; font-size:2rem">💧💧</div>
+                    <div class="gather-label">Fishing...</div>
+                `;
             }
             
-            checkLevelUp();
-            saveGame(); updateEnergy();
+            document.body.appendChild(overlay);
+            
+            // Disable gather buttons
+            let herbBtn = document.getElementById('btn-gather-herbs');
+            let fishBtn = document.getElementById('btn-gather-fish');
+            if(herbBtn) herbBtn.disabled = true;
+            if(fishBtn) fishBtn.disabled = true;
+            
+            globalProgression.cooldowns[type] = Date.now() + (10 * 60 * 1000);
+            
+            setTimeout(() => {
+                // Remove overlay
+                let ol = document.getElementById('gather-overlay');
+                if(ol) ol.remove();
+                if(herbBtn) herbBtn.disabled = false;
+                if(fishBtn) fishBtn.disabled = false;
+                
+                let log = document.getElementById('story-log'); playSound('heal');
+                
+                // Gold & XP gains
+                let xpGain = Math.floor(getXpForNextLevel(player.lvl) * 0.10);
+                globalProgression.gold += 5;
+                player.xp += xpGain;
+
+                showFloatText(`btn-gather-${type}`, `+${xpGain} XP`, 'text-yellow-400');
+
+                if(type === 'herbs') {
+                    let r1 = Math.floor(Math.random()*3)+1; let r2 = Math.floor(Math.random()*3)+1;
+                    globalProgression.inventory.herb_red += r1; globalProgression.inventory.herb_blue += r2;
+                    if(log) log.innerHTML = `<span class="text-green-400">Gathered ${r1} Crimson & ${r2} Azure Herbs! (+5G, +${xpGain}XP)</span>`;
+                } else if (type === 'fish') {
+                    let types = [1,2,3,4,5,6];
+                    let pick1 = types.splice(Math.floor(Math.random()*types.length), 1)[0]; let pick2 = types.splice(Math.floor(Math.random()*types.length), 1)[0];
+                    let a1 = Math.floor(Math.random()*2)+1; let a2 = Math.floor(Math.random()*2)+1;
+                    globalProgression.inventory[`fish_${pick1}`] += a1; globalProgression.inventory[`fish_${pick2}`] += a2;
+                    if(log) log.innerHTML = `<span class="text-blue-400">Caught ${a1} ${MAT_NAMES['fish_'+pick1]} & ${a2} ${MAT_NAMES['fish_'+pick2]}! (+5G, +${xpGain}XP)</span>`;
+                }
+                
+                checkLevelUp();
+                saveGame(); updateEnergy();
+            }, 3000);
         }
 
         function gambleGold(amount) {
@@ -1584,7 +1564,7 @@
             document.getElementById('char-stat-dodge').innerText = `${(a.resistance * 0.1).toFixed(1)}%`;
             document.getElementById('char-stat-hit').innerText = `${(a.reflexes * 0.1).toFixed(1)}%`;
             document.getElementById('char-stat-crit').innerText = `${Math.min(75, 5 + (a.reflexes * 1)).toFixed(0)}%`;
-            document.getElementById('char-stat-critdmg').innerText = `${(150 + (a.fury * 1)).toFixed(0)}%`;
+            document.getElementById('char-stat-critdmg').innerText = `${(150 + (a.fury * 1) + (a.willpower * 0.5)).toFixed(0)}%`;
             document.getElementById('char-stat-dmgred').innerText = `${(a.tenacity * 0.1).toFixed(1)}%`;
             document.getElementById('char-stat-reflect').innerText = `${(a.tenacity * 0.01).toFixed(2)}%`;
             document.getElementById('char-stat-skilldmg').innerText = `${(a.agility * 0.1).toFixed(1)}%`;
@@ -1632,6 +1612,49 @@
         }
 
         const WILLPOWER_CAP = 50;
+        const DEVASTATION_CAP = 100;
+
+        const ENHANCEMENT_RARITIES = ['normal', 'rare', 'epic', 'legendary'];
+        const ENHANCEMENT_RARITY_COLORS = { normal: 'text-gray-300', rare: 'text-blue-400', epic: 'text-purple-400', legendary: 'text-yellow-400' };
+        const ENHANCEMENT_RARITY_BORDERS = { normal: 'border-gray-600', rare: 'border-blue-500', epic: 'border-purple-500', legendary: 'border-yellow-500' };
+
+        const ENHANCEMENT_DEFS = {
+            rage: {
+                name: 'Rage', icon: '😤', type: 'passive', stackable: false,
+                desc: (r) => { let vals = { normal: 5, rare: 8, epic: 13, legendary: 17 }; return `+${vals[r]}% damage when HP < 30% (2 turns, once per battle)`; },
+                vals: { normal: 0.05, rare: 0.08, epic: 0.13, legendary: 0.17 }
+            },
+            divineShield: {
+                name: 'Divine Shield', icon: '🛡️', type: 'passive', stackable: true,
+                desc: (r) => { let vals = { normal: 20, rare: 22, epic: 30, legendary: 40 }; return `Block ${vals[r]}% damage with ${vals[r]}% chance (once per battle)`; },
+                vals: { normal: 0.20, rare: 0.22, epic: 0.30, legendary: 0.40 }
+            },
+            reflect: {
+                name: 'Reflect', icon: '🔄', type: 'passive', stackable: true,
+                desc: (r) => { let vals = { normal: 20, rare: 24, epic: 34, legendary: 44 }; return `${vals[r]}% chance to reflect ${vals[r]}% damage (once per battle)`; },
+                vals: { normal: 0.20, rare: 0.24, epic: 0.34, legendary: 0.44 }
+            },
+            damageBoost: {
+                name: 'Damage Boost', icon: '⚔️', type: 'passive', stackable: true,
+                desc: (r) => { let vals = { normal: 3, rare: 5, epic: 10, legendary: 15 }; return `+${vals[r]}% all damage dealt`; },
+                vals: { normal: 0.03, rare: 0.05, epic: 0.10, legendary: 0.15 }
+            },
+            hpBoost: {
+                name: 'HP Boost', icon: '❤️', type: 'passive', stackable: true,
+                desc: (r) => { let vals = { normal: 10, rare: 12, epic: 18, legendary: 27 }; return `+${vals[r]}% max HP`; },
+                vals: { normal: 0.10, rare: 0.12, epic: 0.18, legendary: 0.27 }
+            },
+            xpIncrease: {
+                name: 'XP Increase', icon: '⭐', type: 'passive', stackable: true,
+                desc: (r) => { let vals = { normal: 2, rare: 3, epic: 5, legendary: 9 }; return `+${vals[r]}% XP gain`; },
+                vals: { normal: 0.02, rare: 0.03, epic: 0.05, legendary: 0.09 }
+            },
+            wayOfHeavens: {
+                name: 'Way of the Heavens', icon: '☀️', type: 'active', stackable: false,
+                desc: (r) => `Strike ALL enemies for 30% HP + Bleed, Burn (5% HP/t), Poison. 10-turn global cooldown.`,
+                vals: { legendary: 0.30 }
+            }
+        };
 
         function showAttributes() {
             const availEl = document.getElementById('attr-points-avail');
@@ -1644,11 +1667,11 @@
                 { id: 'hp', name: 'HP', desc: '+12 Health, +0.01% HP Regen', color: 'text-red-400' },
                 { id: 'tenacity', name: 'Tenacity', desc: '+0.1% Dmg Reduction, +0.01% Dmg Reflect, +2 Health', color: 'text-orange-400' },
                 { id: 'agility', name: 'Agility', desc: '+0.1% Skill Dmg, +2 Health, +1 Attack Damage', color: 'text-yellow-400' },
-                { id: 'willpower', name: 'Willpower', desc: '+3 Attack Damage (Max 50)', color: 'text-blue-400' },
+                { id: 'willpower', name: 'Willpower', desc: '+2 Attack Damage, +0.5% Crit Damage (Max 50)', color: 'text-blue-400' },
                 { id: 'resistance', name: 'Resistance', desc: '+0.1% Dodge Chance, +2 Health, +0.1% Damage Mitigation', color: 'text-purple-400' },
                 { id: 'reflexes', name: 'Reflexes', desc: '+0.1% Hit Chance, +1% Crit Chance, +1 Attack', color: 'text-green-400' },
                 { id: 'fury', name: 'Fury', desc: '+1% Crit Damage', color: 'text-red-500' },
-                { id: 'devastation', name: 'Devastation', desc: '+1 to ALL Stats (Costs 5 Pts)', color: 'text-pink-500' }
+                { id: 'devastation', name: 'Devastation', desc: '+1 to ALL Stats (Costs 5 Pts, Max 100)', color: 'text-pink-500' }
             ];
 
             attrDefs.forEach(a => {
@@ -1658,13 +1681,15 @@
                 let isWillpower = a.id === 'willpower';
                 let cost = isDevastation ? 5 : 1;
 
-                // + button: disabled if can't afford or willpower is capped
-                let plusDisabled = (player.statPoints < cost) || (isWillpower && currentVal >= WILLPOWER_CAP) ? 'disabled' : '';
+                // + button: disabled if can't afford or willpower/devastation is capped
+                let plusDisabled = (player.statPoints < cost) || (isWillpower && currentVal >= WILLPOWER_CAP) || (isDevastation && currentVal >= DEVASTATION_CAP) ? 'disabled' : '';
 
                 // +10 button disabled logic
                 let plus10Disabled;
                 if (isWillpower) {
                     plus10Disabled = (currentVal >= WILLPOWER_CAP || player.statPoints < 1) ? 'disabled' : '';
+                } else if (isDevastation) {
+                    plus10Disabled = (currentVal >= DEVASTATION_CAP || player.statPoints < 50) ? 'disabled' : '';
                 } else {
                     let plus10Cost = isDevastation ? 50 : 10;
                     plus10Disabled = player.statPoints < plus10Cost ? 'disabled' : '';
@@ -1676,7 +1701,7 @@
                 // -10 button: disabled if fewer than 10 levels above minimum
                 let minus10Disabled = (currentVal - 10) < minVal ? 'disabled' : '';
 
-                let levelDisplay = isWillpower ? `Lv. ${currentVal} / ${WILLPOWER_CAP}` : `Lv. ${currentVal}`;
+                let levelDisplay = isWillpower ? `Lv. ${currentVal} / ${WILLPOWER_CAP}` : (isDevastation ? `Lv. ${currentVal} / ${DEVASTATION_CAP}` : `Lv. ${currentVal}`);
 
                 let btn = document.createElement('div');
                 btn.className = "flex items-center justify-between bg-gray-900 p-2 rounded-lg border border-gray-700 shadow-sm";
@@ -1711,6 +1736,11 @@
                 globalProgression.attributes['willpower'] = currentVal + canAllocate;
             } else if (id === 'devastation') {
                 let totalCost = 5 * count;
+                let currentDevVal = globalProgression.attributes['devastation'] || 0;
+                let canAllocateDev = Math.min(count, DEVASTATION_CAP - currentDevVal);
+                if (canAllocateDev <= 0) return;
+                count = canAllocateDev;
+                totalCost = 5 * count;
                 if (player.statPoints < totalCost) return;
                 player.statPoints -= totalCost;
                 globalProgression.attributes['devastation'] = (globalProgression.attributes['devastation'] || 0) + count;
@@ -2049,6 +2079,35 @@
                 container.appendChild(iceCol);
             }
             switchScreen('screen-skilltree');
+
+            // Render enhancements section
+            let enhContainer = document.getElementById('skill-tree-enhancements');
+            if(!enhContainer) return;
+            let enhancements = globalProgression.skillTreeEnhancements || [];
+            if(enhancements.length === 0) {
+                enhContainer.innerHTML = '<div class="text-center text-gray-500 text-xs py-4">No enhancements yet. Spend skill points to unlock random enhancements!</div>';
+                return;
+            }
+            enhContainer.innerHTML = '<div class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2 border-b border-gray-700 pb-1">🎁 Your Enhancements</div>';
+            enhancements.forEach((enh, i) => {
+                let def = ENHANCEMENT_DEFS[enh.type];
+                let rarityColor = ENHANCEMENT_RARITY_COLORS[enh.rarity];
+                let borderColor = ENHANCEMENT_RARITY_BORDERS[enh.rarity];
+                let canReroll = enh.rarity !== 'legendary';
+                let div = document.createElement('div');
+                div.className = `flex items-center justify-between bg-gray-900 border ${borderColor} rounded-xl p-3 mb-2 shadow-md`;
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">${def.icon}</span>
+                        <div>
+                            <div class="font-bold ${rarityColor} text-sm">${def.name} <span class="text-[10px] uppercase">(${enh.rarity})</span></div>
+                            <div class="text-[10px] text-gray-400">${def.desc(enh.rarity)}</div>
+                        </div>
+                    </div>
+                    ${canReroll ? `<button onclick="rerollEnhancement(${i})" class="bg-yellow-800 hover:bg-yellow-700 border border-yellow-600 text-yellow-200 text-xs font-bold px-2 py-1 rounded transition active:scale-95 whitespace-nowrap">🎲 20G</button>` : '<span class="text-yellow-400 text-xs">✨ MAX</span>'}
+                `;
+                enhContainer.appendChild(div);
+            });
         }
 
         function unlockNextNode(path, index=0) {
@@ -2078,6 +2137,7 @@
                     else {
                         globalProgression.attributes[picked] = (globalProgression.attributes[picked] || 1) + 1;
                         showFloatText('hub-avatar', `+1 ${picked.toUpperCase()}`, 'text-red-400');
+                        let newEnh = rollEnhancement(); globalProgression.skillTreeEnhancements.push(newEnh); showEnhancementPopup(newEnh);
                     }
                 } else {
                     player.treeProgressDefense = (player.treeProgressDefense||0) + 1;
@@ -2087,6 +2147,7 @@
                     else {
                         globalProgression.attributes[picked] = (globalProgression.attributes[picked] || 1) + 1;
                         showFloatText('hub-avatar', `+1 ${picked.toUpperCase()}`, 'text-blue-400');
+                        let newEnh = rollEnhancement(); globalProgression.skillTreeEnhancements.push(newEnh); showEnhancementPopup(newEnh);
                     }
                 }
             }
@@ -2103,6 +2164,7 @@
                     else {
                         globalProgression.attributes[picked] = (globalProgression.attributes[picked] || 1) + 1;
                         showFloatText('hub-avatar', `+1 ${picked.toUpperCase()}`, 'text-orange-400');
+                        let newEnh = rollEnhancement(); globalProgression.skillTreeEnhancements.push(newEnh); showEnhancementPopup(newEnh);
                     }
                 } else {
                     player.treeProgressIce = (player.treeProgressIce||0) + 1;
@@ -2112,6 +2174,7 @@
                     else {
                         globalProgression.attributes[picked] = (globalProgression.attributes[picked] || 1) + 1;
                         showFloatText('hub-avatar', `+1 ${picked.toUpperCase()}`, 'text-cyan-400');
+                        let newEnh = rollEnhancement(); globalProgression.skillTreeEnhancements.push(newEnh); showEnhancementPopup(newEnh);
                     }
                 }
             }
@@ -2126,6 +2189,111 @@
             if(player.skillPoints < 1) return; player.skillPoints--;
             if(stat === 'hp') { player.treeBonusHp += 20; player.currentHp += 20; } if(stat === 'dmg') player.treeBonusDmg += 5; if(stat === 'def') player.treeBonusDef += 2;
             player.maxHp = calculateMaxHp(); saveGame(); showSkillTree();
+        }
+
+        function rollEnhancement() {
+            let rarityRoll = Math.random();
+            let rarity;
+            if(rarityRoll < 0.01) rarity = 'legendary';
+            else if(rarityRoll < 0.11) rarity = 'epic';
+            else if(rarityRoll < 0.31) rarity = 'rare';
+            else rarity = 'normal';
+            
+            let typeRoll = Math.random() * 100;
+            let enhType;
+            if(typeRoll < 40) enhType = 'damageBoost';
+            else if(typeRoll < 80) enhType = 'hpBoost';
+            else if(typeRoll < 85) enhType = 'wayOfHeavens';
+            else if(typeRoll < 88.33) enhType = 'rage';
+            else if(typeRoll < 91.66) enhType = 'divineShield';
+            else if(typeRoll < 94.99) enhType = 'reflect';
+            else enhType = 'xpIncrease';
+            
+            if(enhType === 'wayOfHeavens') rarity = 'legendary';
+            
+            if(enhType === 'rage') {
+                let hasRage = globalProgression.skillTreeEnhancements.some(e => e.type === 'rage');
+                if(hasRage) {
+                    if(typeRoll < 85) enhType = 'damageBoost';
+                    else if(typeRoll < 91.66) enhType = 'divineShield';
+                    else if(typeRoll < 97) enhType = 'reflect';
+                    else enhType = 'xpIncrease';
+                }
+            }
+            
+            if(enhType !== 'wayOfHeavens') rarity = 'normal';
+            
+            return { type: enhType, rarity: rarity };
+        }
+
+        function showEnhancementPopup(enh) {
+            let def = ENHANCEMENT_DEFS[enh.type];
+            let rarityColor = ENHANCEMENT_RARITY_COLORS[enh.rarity];
+            let popup = document.createElement('div');
+            popup.id = 'enhancement-popup';
+            popup.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;';
+            popup.innerHTML = `
+                <div class="bg-gray-900 border-2 ${ENHANCEMENT_RARITY_BORDERS[enh.rarity]} rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center">
+                    <div class="text-5xl mb-3">${def.icon}</div>
+                    <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">New Enhancement Unlocked!</div>
+                    <div class="text-2xl font-black ${rarityColor} mb-1">${def.name}</div>
+                    <div class="text-sm font-bold ${rarityColor} uppercase tracking-widest mb-3">${enh.rarity}</div>
+                    <div class="text-sm text-gray-300 bg-gray-800 rounded-xl p-3 mb-4">${def.desc(enh.rarity)}</div>
+                    <button onclick="document.getElementById('enhancement-popup').remove()" class="w-full bg-indigo-700 hover:bg-indigo-600 text-white font-bold py-3 rounded-xl transition active:scale-95">
+                        Awesome!
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+        }
+
+        function rerollEnhancement(index) {
+            let enh = globalProgression.skillTreeEnhancements[index];
+            if(!enh || enh.rarity === 'legendary') return;
+            if(globalProgression.gold < 20) { alert('Not enough gold! Need 20G to re-roll.'); return; }
+            globalProgression.gold -= 20;
+            let rarityRoll = Math.random();
+            let newRarity;
+            if(rarityRoll < 0.01) newRarity = 'legendary';
+            else if(rarityRoll < 0.11) newRarity = 'epic';
+            else if(rarityRoll < 0.31) newRarity = 'rare';
+            else newRarity = 'normal';
+            let rarityIndex = ENHANCEMENT_RARITIES.indexOf(enh.rarity);
+            let newRarityIndex = ENHANCEMENT_RARITIES.indexOf(newRarity);
+            if(newRarityIndex > rarityIndex) {
+                enh.rarity = newRarity;
+                if(newRarity === 'legendary') showEnhancementPopup({ type: enh.type, rarity: 'legendary' });
+            }
+            player.maxHp = calculateMaxHp();
+            saveGame();
+            showSkillTree();
+        }
+
+        function useWayOfHeavens() {
+            if(!combatActive || !isPlayerTurn) return;
+            let woh = (globalProgression.skillTreeEnhancements || []).find(e => e.type === 'wayOfHeavens');
+            if(!woh) return;
+            if((player.wayOfHeavensCooldown || 0) > 0) {
+                addLog(`Way of the Heavens: ${player.wayOfHeavensCooldown} turns remaining!`, 'text-gray-400');
+                return;
+            }
+            enemies.forEach((e, i) => {
+                if(e.currentHp <= 0) return;
+                let dmg = Math.floor(e.maxHp * 0.30);
+                e.currentHp = Math.max(0, e.currentHp - dmg);
+                e.bleedStacks = (e.bleedStacks || 0) + 1;
+                e.bleedTurns = Math.max(e.bleedTurns || 0, 3);
+                e.burnTurns = Math.max(e.burnTurns || 0, 1);
+                e.poisonTurns = Math.max(e.poisonTurns || 0, 3);
+                showFloatText(`enemy-card-${i}`, `-${dmg}`, 'text-yellow-400');
+            });
+            player.wayOfHeavensCooldown = 10;
+            addLog('Way of the Heavens! Strike all enemies for 30% HP + Bleed, Burn, Poison!', 'text-yellow-400');
+            playSound('win');
+            isPlayerTurn = false;
+            saveGame();
+            updateCombatUI(); renderSkills();
+            setTimeout(() => executeEnemyTurns(0), 800);
         }
 
         // --- ENCHANTER ---
@@ -2825,7 +2993,9 @@
                 player.regenBuffs = []; player.activeBuffs = []; 
                 player.stunned = 0; player.bleedStacks = 0; player.bleedTurns = 0; player.dodgeTurns = 0;
             } 
-            player.shield = 0; 
+            player.shield = 0;
+            player.rageUsed = false; player.divineShieldUsed = false; player.reflectUsed = false;
+            player.rageActive = player.rageActive || 0;
             Object.keys(player.skillCooldowns).forEach(k => player.skillCooldowns[k] = 0);
             combatLog = [`Encountered ${enemies.length} enemies!`, "Fight!"]; isPlayerTurn = true;
             updateCombatUI(); renderSkills(); renderConsumables(); renderUsableSlots(); switchScreen('screen-combat');
@@ -3040,6 +3210,17 @@
                     container.appendChild(empty);
                 }
             }
+            // Way of the Heavens button
+            let woh = (globalProgression.skillTreeEnhancements || []).find(e => e.type === 'wayOfHeavens');
+            if(woh) {
+                let cd = player.wayOfHeavensCooldown || 0;
+                let wohBtn = document.createElement('button');
+                wohBtn.className = `skill-btn col-span-5 w-full mt-1 p-2 rounded-lg font-bold text-black bg-yellow-400 hover:bg-yellow-300 shadow-lg active:scale-95 flex items-center justify-center gap-2 text-xs`;
+                wohBtn.disabled = cd > 0 || !isPlayerTurn || isAutoBattle || !combatActive || player.stunned > 0;
+                wohBtn.innerHTML = `☀️ Way of the Heavens ${cd > 0 ? `(CD:${cd})` : ''}`;
+                wohBtn.onclick = () => useWayOfHeavens();
+                container.appendChild(wohBtn);
+            }
         }
 
         function addLog(msg, colorClass = "text-gray-300") {
@@ -3122,6 +3303,10 @@
                 
                 player.activeBuffs = player.activeBuffs.filter(b => b.turns > 0); 
             }
+
+            // Decrement enhancement cooldowns
+            if((player.rageActive || 0) > 0) player.rageActive--;
+            if((player.wayOfHeavensCooldown || 0) > 0) player.wayOfHeavensCooldown--;
         }
 
         function usePlayerSkill(slotIndex) {
@@ -3141,6 +3326,25 @@
             
             let scaledPower = Math.max(1, Math.floor(baseDmg * skill.mult * buffDmgMult * skillDmgMult));
             let hits = skill.hits || 1;
+
+            // Apply Damage Boost enhancements
+            let dmgBoostMult = 1;
+            (globalProgression.skillTreeEnhancements || []).forEach(enh => {
+                if(enh.type === 'damageBoost') dmgBoostMult += ENHANCEMENT_DEFS.damageBoost.vals[enh.rarity];
+            });
+
+            // Rage enhancement
+            let rageEnh = globalProgression.skillTreeEnhancements ? globalProgression.skillTreeEnhancements.find(e => e.type === 'rage') : null;
+            if(rageEnh && !player.rageUsed && player.currentHp / player.maxHp < 0.30) {
+                dmgBoostMult += ENHANCEMENT_DEFS.rage.vals[rageEnh.rarity];
+                player.rageUsed = true;
+                player.rageActive = 2;
+                addLog(`Rage activates! +${(ENHANCEMENT_DEFS.rage.vals[rageEnh.rarity]*100).toFixed(0)}% damage!`, 'text-red-400');
+            }
+            if((player.rageActive || 0) > 0 && rageEnh) {
+                dmgBoostMult += ENHANCEMENT_DEFS.rage.vals[rageEnh.rarity];
+            }
+            scaledPower = Math.max(1, Math.floor(scaledPower * dmgBoostMult));
 
             if (skill.type === 'attack') {
                 
@@ -3188,7 +3392,7 @@
                         let critChance = Math.min(0.75, 0.05 + (a.reflexes * 0.01));
                         let isCrit = Math.random() < critChance;
                         if(isCrit) {
-                            let critMult = 1.5 + (a.fury * 0.01);
+                            let critMult = (150 + (a.fury * 1) + (a.willpower * 0.5)) / 100;
                             hitDmg = Math.floor(hitDmg * critMult);
                             addLog(`CRITICAL HIT!`, "text-yellow-400 font-bold");
                         }
@@ -3388,6 +3592,17 @@
             let tenacityReduction = 1 - (a.tenacity * 0.001);
             let dmg = Math.floor(baseDmg * tenacityReduction);
             
+            // Divine Shield enhancement
+            let divineEnh = globalProgression.skillTreeEnhancements ? globalProgression.skillTreeEnhancements.find(e => e.type === 'divineShield') : null;
+            if(divineEnh && !player.divineShieldUsed) {
+                if(Math.random() < ENHANCEMENT_DEFS.divineShield.vals[divineEnh.rarity]) {
+                    let blocked = Math.floor(dmg * ENHANCEMENT_DEFS.divineShield.vals[divineEnh.rarity]);
+                    dmg -= blocked;
+                    addLog(`Divine Shield blocked ${blocked} damage!`, 'text-blue-400');
+                    player.divineShieldUsed = true;
+                }
+            }
+            
             if (player.shield > 0) { dmg = Math.floor(dmg * (1 - player.shield)); player.shield = 0; }
             
             // Apply Resistance Damage Mitigation (capped at 70%)
@@ -3409,6 +3624,13 @@
             let reflectPct = a.tenacity * 0.0001;
             let fireShieldActive = player.activeBuffs && player.activeBuffs.some(b => b.type === 'fire_shield');
             if(fireShieldActive) reflectPct += 0.01;
+
+            // Reflect enhancement
+            let reflectEnh = globalProgression.skillTreeEnhancements ? globalProgression.skillTreeEnhancements.find(e => e.type === 'reflect') : null;
+            if(reflectEnh && !player.reflectUsed && Math.random() < ENHANCEMENT_DEFS.reflect.vals[reflectEnh.rarity]) {
+                reflectPct += ENHANCEMENT_DEFS.reflect.vals[reflectEnh.rarity];
+                player.reflectUsed = true;
+            }
 
             if(reflectPct > 0 && attackerEnemy) {
                 let reflectDmg = Math.max(1, Math.floor(dmg * reflectPct));
@@ -3607,6 +3829,12 @@
                 });
                 
                 if((globalProgression.wellXpBattles || 0) > 0) totalXp *= 2;
+                // Apply XP Increase enhancements
+                let xpMult = 1;
+                (globalProgression.skillTreeEnhancements || []).forEach(enh => {
+                    if(enh.type === 'xpIncrease') xpMult += ENHANCEMENT_DEFS.xpIncrease.vals[enh.rarity];
+                });
+                totalXp = Math.floor(totalXp * xpMult);
                 document.getElementById('end-xp-amount').innerText = totalXp; globalProgression.totalExpEarned += totalXp;
 
                 consumeWellBattleCharges();
