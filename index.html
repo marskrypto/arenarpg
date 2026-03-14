@@ -1050,14 +1050,14 @@
                 skills: [
                     { name: 'Slash', type: 'attack', mult: 1, cd: 0, color: 'bg-gray-700', desc: 'Base damage' },
                     { name: 'Cleave', type: 'attack', mult: 1, effect: { bleed: true, turns: 5 }, cd: 5, color: 'bg-red-700', desc: 'Dmg + 1% Max HP Bleed (5t)' },
-                    { name: 'Ruthless Bash', type: 'attack', mult: 1.05, cd: 7, color: 'bg-orange-700', desc: 'Base dmg + 5%' },
+                    { name: 'Ruthless Bash', type: 'attack', mult: 1.05, effect: { bleed: true, turns: 5, chance: 0.50 }, cd: 7, color: 'bg-orange-700', desc: 'Base dmg + 5%, 50% bleed chance' },
                     { name: 'Weapon Throw', type: 'attack', mult: 1, effect: { bleed: true, turns: 5 }, cd: 5, color: 'bg-stone-600', desc: 'Dmg + Bleed stack' },
-                    { name: 'Whirlwind', type: 'attack', mult: 0.33, hits: 3, effect: { defDown: 0.01 }, cd: 6, color: 'bg-gray-600', desc: '3x hits, reduce def 1%' },
-                    { name: 'Knockout', type: 'attack', mult: 1.02, effect: { defDown: 0.01 }, cd: 6, color: 'bg-yellow-700', desc: 'Dmg + 2%, reduce def 1%' },
+                    { name: 'Whirlwind', type: 'attack', mult: 0.33, hits: 3, effect: { defDown: 0.01, bleed: true, turns: 5 }, cd: 6, color: 'bg-gray-600', desc: '3x hits, reduce def 1%, +1 bleed stack' },
+                    { name: 'Knockout', type: 'attack', mult: 1.02, effect: { defDown: 0.03 }, self_effect: { defUp: 0.05, turns: 3 }, cd: 6, color: 'bg-yellow-700', desc: 'Dmg + 2%, reduce enemy def 3%, +5% self def' },
                     { name: 'Stomp', type: 'attack', mult: 1, effect: { healBlock: 1 }, self_effect: { healPct: 0.05 }, cd: 7, color: 'bg-stone-800', desc: 'Dmg, Heal block 1t, +5% Self-Heal' },
-                    { name: 'Soul Remover', type: 'attack', mult: 1, hits: 3, target: 'random', self_effect: { defDown: 0.10, turns: 2 }, cd: 8, color: 'bg-purple-800', desc: '3x random hits. -10% self def (2t)' },
-                    { name: 'Eruption', type: 'buff', mult: 0, self_effect: { regenPct: 0.20, turns: 2 }, cd: 10, color: 'bg-red-600', desc: 'Regen 20% HP/t (2t)' },
-                    { name: 'Def Up', type: 'buff', mult: 0, self_effect: { defUp: 0.50, turns: 3 }, cd: 8, color: 'bg-blue-700', desc: '+50% Def (3t)' }
+                    { name: 'Soul Remover', type: 'attack', mult: 1, hits: 3, target: 'random', self_effect: { defDown: 0.15, turns: 2 }, cd: 8, color: 'bg-purple-800', desc: '3x random hits. -15% self def (2t)' },
+                    { name: 'Eruption', type: 'buff', mult: 0, self_effect: { regenPct: 0.20, turns: 2, dmgUp: 0.03, dmgUpTurns: 3 }, cd: 10, color: 'bg-red-600', desc: 'Regen 20% HP/t (2t), +3% Dmg (3t)' },
+                    { name: 'Def Up', type: 'buff', mult: 0, self_effect: { defUp: 0.50, turns: 3, blockHit: true, blockChance: 0.50 }, cd: 8, color: 'bg-blue-700', desc: '+50% Def (3t), 50% block hit (1t)' }
                 ]
             },
             mage: {
@@ -3198,7 +3198,12 @@
                         showFloatText(`enemy-card-${tIdx}`, `-${hitDmg}`, `text-dmg-green font-bold ${isCrit ? 'text-2xl drop-shadow-[0_0_5px_#39ff14]' : ''}`);
 
                         if(skill.effect) {
-                            if(skill.effect.bleed) { target.bleedStacks = (target.bleedStacks || 0) + 1; target.bleedTurns = skill.effect.turns; }
+                            if(skill.effect.bleed) {
+                                let bleedChance = skill.effect.chance !== undefined ? skill.effect.chance : 1.0;
+                                if(Math.random() < bleedChance) {
+                                    target.bleedStacks = (target.bleedStacks || 0) + 1; target.bleedTurns = skill.effect.turns;
+                                }
+                            }
                             if(skill.effect.defDown) { target.defReduction = Math.min(1, (target.defReduction || 0) + skill.effect.defDown); }
                             if(skill.effect.healBlock) { target.healBlock = skill.effect.healBlock; }
                             if(skill.effect.stunChance && Math.random() < skill.effect.stunChance) {
@@ -3229,6 +3234,13 @@
                 if(skill.self_effect.defUp) { player.activeBuffs.push({ type: 'def', val: 1 + skill.self_effect.defUp, turns: skill.self_effect.turns }); }
                 if(skill.self_effect.fireShield) { player.activeBuffs.push({ type: 'fire_shield', turns: skill.self_effect.turns }); }
                 if(skill.self_effect.iceShield) { player.activeBuffs.push({ type: 'ice_shield', turns: skill.self_effect.turns }); }
+                if(skill.self_effect.dmgUp) { player.activeBuffs.push({ type: 'dmg', val: 1 + skill.self_effect.dmgUp, turns: skill.self_effect.dmgUpTurns || skill.self_effect.turns }); }
+                if(skill.self_effect.blockHit) {
+                    if(Math.random() < (skill.self_effect.blockChance || 0.50)) {
+                        player.activeBuffs.push({ type: 'block_hit', turns: 1 });
+                        addLog(`Block stance! May block next hit!`, 'text-blue-300 font-bold');
+                    }
+                }
             }
 
             player.skillCooldowns[skillIdx] = skill.cd + 1; 
@@ -3357,6 +3369,16 @@
                 addLog(`You dodged!`, "text-gray-400 font-bold");
                 showFloatText('player-avatar-container', `DODGE`, 'text-gray-400');
                 player.dodgeTurns = 0;
+                return;
+            }
+
+            // Check for block hit
+            let blockBuff = player.activeBuffs.find(b => b.type === 'block_hit');
+            if(blockBuff) {
+                player.activeBuffs = player.activeBuffs.filter(b => b !== blockBuff);
+                addLog(`Blocked the hit!`, "text-blue-400 font-bold");
+                showFloatText('player-avatar-container', `BLOCKED`, 'text-blue-400');
+                playSound('shield');
                 return;
             }
 
