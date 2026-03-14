@@ -339,6 +339,7 @@
             <div class="bg-gray-800 border border-gray-700 rounded-xl p-3 shadow-lg flex flex-col gap-2 mb-4" id="attr-list">
                 <!-- Dynamically populated -->
             </div>
+            <button onclick="respecAttributes()" class="w-full bg-red-700 hover:bg-red-600 text-white py-2 rounded-lg font-bold text-sm transition active:scale-95 border border-red-500 shadow-md">🔄 Respec All Attributes (Free)</button>
         </div>
     </div>
 
@@ -1266,6 +1267,8 @@
             switchScreen('screen-character');
         }
 
+        const WILLPOWER_CAP = 50;
+
         function showAttributes() {
             const availEl = document.getElementById('attr-points-avail');
             if(availEl) availEl.innerText = player.statPoints;
@@ -1277,7 +1280,7 @@
                 { id: 'hp', name: 'HP', desc: '+12 Health, +0.01% HP Regen', color: 'text-red-400' },
                 { id: 'tenacity', name: 'Tenacity', desc: '+0.1% Dmg Reduction, +0.01% Dmg Reflect, +2 Health', color: 'text-orange-400' },
                 { id: 'agility', name: 'Agility', desc: '+0.1% Skill Dmg, +2 Health, +1 Attack Damage', color: 'text-yellow-400' },
-                { id: 'willpower', name: 'Willpower', desc: '+3 Attack Damage', color: 'text-blue-400' },
+                { id: 'willpower', name: 'Willpower', desc: '+3 Attack Damage (Max 50)', color: 'text-blue-400' },
                 { id: 'resistance', name: 'Resistance', desc: '+0.1% Dodge Chance, +2 Health, +0.1% Damage Mitigation', color: 'text-purple-400' },
                 { id: 'reflexes', name: 'Reflexes', desc: '+0.1% Hit Chance, +1% Crit Chance, +1 Attack', color: 'text-green-400' },
                 { id: 'fury', name: 'Fury', desc: '+1% Crit Damage', color: 'text-red-500' },
@@ -1286,19 +1289,45 @@
 
             attrDefs.forEach(a => {
                 let currentVal = globalProgression.attributes[a.id] || (a.id === 'devastation' ? 0 : 1);
+                let minVal = a.id === 'devastation' ? 0 : 1;
+                let isDevastation = a.id === 'devastation';
+                let isWillpower = a.id === 'willpower';
+                let cost = isDevastation ? 5 : 1;
+
+                // + button: disabled if can't afford or willpower is capped
+                let plusDisabled = (player.statPoints < cost) || (isWillpower && currentVal >= WILLPOWER_CAP) ? 'disabled' : '';
+
+                // +10 button disabled logic
+                let plus10Disabled;
+                if (isWillpower) {
+                    plus10Disabled = (currentVal >= WILLPOWER_CAP || player.statPoints < 1) ? 'disabled' : '';
+                } else {
+                    let plus10Cost = isDevastation ? 50 : 10;
+                    plus10Disabled = player.statPoints < plus10Cost ? 'disabled' : '';
+                }
+
+                // - button: disabled if at minimum
+                let minusDisabled = currentVal <= minVal ? 'disabled' : '';
+
+                // -10 button: disabled if fewer than 10 levels above minimum
+                let minus10Disabled = (currentVal - 10) < minVal ? 'disabled' : '';
+
+                let levelDisplay = isWillpower ? `Lv. ${currentVal} / ${WILLPOWER_CAP}` : `Lv. ${currentVal}`;
+
                 let btn = document.createElement('div');
                 btn.className = "flex items-center justify-between bg-gray-900 p-2 rounded-lg border border-gray-700 shadow-sm";
-                
-                let isDevastation = a.id === 'devastation';
-                let cost = isDevastation ? 5 : 1;
-                let disabledStr = player.statPoints < cost ? 'disabled' : '';
 
                 btn.innerHTML = `
-                    <div class="w-3/4">
-                        <div class="font-bold ${a.color} text-sm">${a.name} <span class="text-white ml-2 text-xs">Lv. ${currentVal}</span></div>
+                    <div class="flex-1 min-w-0 mr-2">
+                        <div class="font-bold ${a.color} text-sm">${a.name} <span class="text-white ml-2 text-xs">${levelDisplay}</span></div>
                         <div class="text-[10px] text-gray-400 leading-tight mt-0.5">${a.desc}</div>
                     </div>
-                    <button onclick="allocateAttribute('${a.id}')" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-white font-bold transition active:scale-95 border border-gray-500 text-lg disabled:opacity-50" ${disabledStr}>+</button>
+                    <div class="flex gap-1 items-center flex-shrink-0">
+                        <button onclick="deallocateAttribute('${a.id}',10)" class="bg-red-800 hover:bg-red-700 px-2 py-1 rounded text-white font-bold transition active:scale-95 border border-red-600 text-xs disabled:opacity-50" ${minus10Disabled}>-10</button>
+                        <button onclick="deallocateAttribute('${a.id}',1)" class="bg-red-800 hover:bg-red-700 px-2 py-1 rounded text-white font-bold transition active:scale-95 border border-red-600 text-sm disabled:opacity-50" ${minusDisabled}>-</button>
+                        <button onclick="allocateAttribute('${a.id}',1)" class="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-white font-bold transition active:scale-95 border border-gray-500 text-sm disabled:opacity-50" ${plusDisabled}>+</button>
+                        <button onclick="allocateAttribute('${a.id}',10)" class="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-white font-bold transition active:scale-95 border border-gray-500 text-xs disabled:opacity-50" ${plus10Disabled}>+10</button>
+                    </div>
                 `;
                 list.appendChild(btn);
             });
@@ -1306,25 +1335,80 @@
             switchScreen('screen-attributes');
         }
 
-        function allocateAttribute(id) {
+        function allocateAttribute(id, count) {
+            count = count || 1;
             let cost = id === 'devastation' ? 5 : 1;
-            if (player.statPoints >= cost) {
-                player.statPoints -= cost;
-                
-                if (id === 'devastation') {
-                    globalProgression.attributes['devastation'] = (globalProgression.attributes['devastation'] || 0) + 1;
-                    ['hp', 'tenacity', 'agility', 'willpower', 'resistance', 'reflexes', 'fury'].forEach(stat => {
-                        globalProgression.attributes[stat] = (globalProgression.attributes[stat] || 1) + 1;
-                    });
-                } else {
-                    globalProgression.attributes[id] = (globalProgression.attributes[id] || 1) + 1;
-                }
-                
-                player.maxHp = calculateMaxHp(); player.currentHp = player.maxHp;
-                saveGame();
-                playSound('click');
-                showAttributes();
+
+            if (id === 'willpower') {
+                let currentVal = globalProgression.attributes['willpower'] || 1;
+                let canAllocate = Math.min(count, WILLPOWER_CAP - currentVal, player.statPoints);
+                if (canAllocate <= 0) return;
+                player.statPoints -= canAllocate;
+                globalProgression.attributes['willpower'] = currentVal + canAllocate;
+            } else if (id === 'devastation') {
+                let totalCost = 5 * count;
+                if (player.statPoints < totalCost) return;
+                player.statPoints -= totalCost;
+                globalProgression.attributes['devastation'] = (globalProgression.attributes['devastation'] || 0) + count;
+                ['hp', 'tenacity', 'agility', 'willpower', 'resistance', 'reflexes', 'fury'].forEach(stat => {
+                    if (stat === 'willpower') {
+                        globalProgression.attributes[stat] = Math.min(WILLPOWER_CAP, (globalProgression.attributes[stat] || 1) + count);
+                    } else {
+                        globalProgression.attributes[stat] = (globalProgression.attributes[stat] || 1) + count;
+                    }
+                });
+            } else {
+                let totalCost = cost * count;
+                if (player.statPoints < totalCost) return;
+                player.statPoints -= totalCost;
+                globalProgression.attributes[id] = (globalProgression.attributes[id] || 1) + count;
             }
+
+            player.maxHp = calculateMaxHp(); player.currentHp = player.maxHp;
+            saveGame();
+            playSound('click');
+            showAttributes();
+        }
+
+        function deallocateAttribute(id, count) {
+            count = count || 1;
+            let minVal = id === 'devastation' ? 0 : 1;
+            let currentVal = globalProgression.attributes[id] || minVal;
+            let canRemove = Math.min(count, currentVal - minVal);
+            if (canRemove <= 0) return;
+
+            if (id === 'devastation') {
+                player.statPoints += canRemove * 5;
+                globalProgression.attributes['devastation'] = currentVal - canRemove;
+                ['hp', 'tenacity', 'agility', 'willpower', 'resistance', 'reflexes', 'fury'].forEach(stat => {
+                    globalProgression.attributes[stat] = Math.max(1, (globalProgression.attributes[stat] || 1) - canRemove);
+                });
+            } else {
+                player.statPoints += canRemove;
+                globalProgression.attributes[id] = currentVal - canRemove;
+            }
+
+            player.maxHp = calculateMaxHp(); player.currentHp = player.maxHp;
+            saveGame();
+            playSound('click');
+            showAttributes();
+        }
+
+        function respecAttributes() {
+            const normalAttrs = ['hp', 'tenacity', 'agility', 'willpower', 'resistance', 'reflexes', 'fury'];
+            let devVal = globalProgression.attributes['devastation'] || 0;
+            let totalRefund = devVal * 5;
+            normalAttrs.forEach(stat => {
+                let currentVal = globalProgression.attributes[stat] || 1;
+                totalRefund += Math.max(0, currentVal - 1 - devVal);
+                globalProgression.attributes[stat] = 1;
+            });
+            globalProgression.attributes['devastation'] = 0;
+            player.statPoints += totalRefund;
+            player.maxHp = calculateMaxHp(); player.currentHp = player.maxHp;
+            saveGame();
+            playSound('click');
+            showAttributes();
         }
 
         // --- EQUIPMENT UI ---
