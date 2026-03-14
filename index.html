@@ -1614,7 +1614,8 @@
                 } else {
                     el.dataset.filled = "false"; el.className = `equip-slot`;
                     let icon = '💍';
-                    if(slot === 'head') icon = '🪖'; else if (slot === 'shoulders') icon = '🛡️'; else if (slot === 'arms') icon = '🦾'; else if (slot === 'weapon') icon = '⚔️'; else if (slot === 'chest') icon = '🦺'; else if (slot === 'waist') icon = '🪢'; else if (slot === 'legs') icon = '👖'; else if (slot === 'boots') icon = '🥾'; else if (slot === 'necklace') icon = '📿'; else if (slot === 'cape') icon = '🧥';
+                    const SLOT_DEFAULT_ICONS = { head:'🪖', shoulders:'🛡️', arms:'🦾', weapon:'⚔️', chest:'🦺', waist:'🪢', legs:'👖', boots:'🥾', necklace:'📿', cape:'🧥' };
+                    if (SLOT_DEFAULT_ICONS[slot]) icon = SLOT_DEFAULT_ICONS[slot];
                     el.innerHTML = badge + icon;
                 }
             });
@@ -1947,16 +1948,6 @@
         function rollEquipment(forcedRarity = null) {
             let slotTypes = ['head', 'shoulders', 'chest', 'arms', 'waist', 'legs', 'boots', 'necklace', 'ring', 'weapon', 'cape'];
             let sType = slotTypes[Math.floor(Math.random() * slotTypes.length)];
-            
-            // Class-specific weapons
-            if (sType === 'weapon') {
-                let classId = player ? player.classId : 'warrior';
-                if (classId === 'warrior') {
-                    // Warriors only get Axes
-                } else if (classId === 'mage') {
-                    // Mages only get Staffs
-                }
-            }
 
             let r = 'common';
             if (forcedRarity) { r = forcedRarity; } 
@@ -1971,25 +1962,23 @@
             let totalPts = player.lvl * mult;
 
             // Class-specific weapon naming
-            let weaponName = '⚔️';
+            let weaponName = 'Sword';
             let weaponIcon = '⚔️';
             if (sType === 'weapon') {
                 let classId = player ? player.classId : 'warrior';
                 if (classId === 'warrior') { weaponName = 'Axe'; weaponIcon = '🪓'; }
                 else if (classId === 'mage') { weaponName = 'Staff'; weaponIcon = '🪄'; }
-                else { weaponName = 'Sword'; weaponIcon = '⚔️'; }
             }
 
+            let SLOT_ICONS = { head:'🪖', shoulders:'🛡️', chest:'🦺', arms:'🦾', waist:'🪢', legs:'👖', boots:'🥾', necklace:'📿', ring:'💍', cape:'🧥', weapon: weaponIcon };
             let e = {
                 id: 'eq_' + Date.now() + Math.floor(Math.random()*1000), type: sType, rarity: r, 
                 name: sType === 'weapon' ? `${r.toUpperCase()} ${weaponName}` : `${r.toUpperCase()} ${sType}`,
-                icon: sType==='head'?'🪖':sType==='shoulders'?'🛡️':sType==='chest'?'🦺':sType==='arms'?'🦾':sType==='waist'?'🪢':sType==='legs'?'👖':sType==='boots'?'🥾':sType==='necklace'?'📿':sType==='ring'?'💍':sType==='cape'?'🧥':weaponIcon,
+                icon: SLOT_ICONS[sType] || '📦',
                 stats: { hp: 0, dmg: 0, def: 0 },
                 bonusStats: [],
                 enchanted: false
             };
-            // Override weapon icon
-            if (sType === 'weapon') e.icon = weaponIcon;
             
             if (sType === 'weapon') { e.stats.dmg = totalPts; }
             else if (sType === 'chest' || sType === 'legs') { e.stats.hp = totalPts * 5; e.stats.def = Math.ceil(totalPts * 0.2); }
