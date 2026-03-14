@@ -1340,7 +1340,7 @@
             if (targetScreen) targetScreen.classList.add('active-screen');
         }
 
-        function showMenu() { stopMusic(); switchScreen('screen-menu'); setTimeout(playMenuMusic, 1100); }
+        function showMenu() { stopMusic(); switchScreen('screen-menu'); setTimeout(playMenuMusic, 1100); /* 1100ms: allows stopMusic() 1s fade-out to complete */ }
         function showClassSelect() { switchScreen('screen-class-select'); }
         
         function changeClass() {
@@ -2991,8 +2991,7 @@
                     if(e.dodgeTurns > 0) eStatus += `💨`;
                     if(e.stunned > 0) eStatus += `😵`;
 
-                    card.innerHTML = `<div class="relative w-full text-center"><div class="absolute -top-1 -right-2 text-sm flex gap-1">${eStatus}</div><div class="text-3xl mb-1 mt-2 ${animClass}">${e.avatar}</div></div><div class="text-[10px] font-bold truncate w-full text-center ${rarityColor}">Lv.${e.lvl} ${e.name}</div><div class="health-bar-container !h-1.5 !mt-1"><div class="health-bar" style="width: ${(Math.max(0, e.currentHp) / e.maxHp) * 100}%"></div></div>`;
-                    if(isDead) card.innerHTML += `<div class="enemy-death-overlay">💀</div>`;
+                    card.innerHTML = `<div class="relative w-full text-center"><div class="absolute -top-1 -right-2 text-sm flex gap-1">${eStatus}</div><div class="text-3xl mb-1 mt-2 ${animClass}">${e.avatar}</div></div><div class="text-[10px] font-bold truncate w-full text-center ${rarityColor}">Lv.${e.lvl} ${e.name}</div><div class="health-bar-container !h-1.5 !mt-1"><div class="health-bar" style="width: ${(Math.max(0, e.currentHp) / e.maxHp) * 100}%"></div></div>${isDead ? '<div class="enemy-death-overlay">💀</div>' : ''}`;
                     eContainer.appendChild(card);
                 });
                 // Show Next Battle button when all enemies are dead and combat still active
