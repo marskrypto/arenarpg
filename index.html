@@ -363,6 +363,7 @@
                     <div class="equip-slot" id="slot-ring2" onclick="openEquipModal('ring2')" title="Ring 2">💍</div>
                     <div class="equip-slot" id="slot-ring3" onclick="openEquipModal('ring3')" title="Ring 3">💍</div>
                     <div class="equip-slot" id="slot-ring4" onclick="openEquipModal('ring4')" title="Ring 4">💍</div>
+                    <div class="equip-slot" id="slot-cape" onclick="openEquipModal('cape')" title="Cape">🧣</div>
                 </div>
             </div>
 
@@ -374,8 +375,8 @@
                 <div class="text-gray-400 pl-3 border-l border-gray-600">HP Regen: <span class="text-green-300 font-bold float-right" id="char-stat-regen">0</span></div>
                 <div class="text-gray-400">Dodge Chance: <span class="text-purple-400 font-bold float-right" id="char-stat-dodge">0%</span></div>
                 <div class="text-gray-400 pl-3 border-l border-gray-600">Hit Chance: <span class="text-green-400 font-bold float-right" id="char-stat-hit">0%</span></div>
-                <div class="text-gray-400">Crit Chance: <span class="text-yellow-400 font-bold float-right" id="char-stat-crit">5%</span></div>
-                <div class="text-gray-400 pl-3 border-l border-gray-600">Crit Damage: <span class="text-red-400 font-bold float-right" id="char-stat-critdmg">150%</span></div>
+                <div class="text-gray-400">Crit Chance: <span class="text-yellow-400 font-bold float-right" id="char-stat-crit">0%</span></div>
+                <div class="text-gray-400 pl-3 border-l border-gray-600">Crit Damage: <span class="text-red-400 font-bold float-right" id="char-stat-critdmg">0%</span></div>
                 <div class="text-gray-400">Dmg Reduction: <span class="text-orange-400 font-bold float-right" id="char-stat-dmgred">0%</span></div>
                 <div class="text-gray-400 pl-3 border-l border-gray-600">Dmg Reflect: <span class="text-orange-300 font-bold float-right" id="char-stat-reflect">0%</span></div>
                 <div class="text-gray-400">Skill Dmg: <span class="text-yellow-300 font-bold float-right" id="char-stat-skilldmg">0%</span></div>
@@ -1039,9 +1040,13 @@
             if(!MAT_NAMES[c.id]) MAT_NAMES[c.id] = c.name;
         });
 
-        const EQUIP_SLOTS = ['head', 'shoulders', 'chest', 'arms', 'waist', 'legs', 'boots', 'necklace', 'ring1', 'ring2', 'ring3', 'ring4', 'weapon'];
+        const EQUIP_SLOTS = ['head', 'shoulders', 'chest', 'arms', 'waist', 'legs', 'boots', 'necklace', 'ring1', 'ring2', 'ring3', 'ring4', 'weapon', 'cape'];
         const RARITIES = ['common', 'rare', 'epic', 'legendary'];
         const RARITY_MULTS = { common: 1, rare: 2, epic: 5, legendary: 10 };
+        const CLASS_BASE_ATTRIBUTES = {
+            warrior: { hp: 10, tenacity: 1, agility: 1, willpower: 1, resistance: 1, reflexes: 1, fury: 1, devastation: 0 },
+            mage:    { hp: 1,  tenacity: 1, agility: 1, willpower: 1, resistance: 1, reflexes: 10, fury: 1, devastation: 0 }
+        };
 
         // CLASSES & SKILLS
         const CLASSES = {
@@ -1260,6 +1265,8 @@
                 if(globalProgression.enemyKillCounts === undefined) globalProgression.enemyKillCounts = {};
                 if(globalProgression.claimedCodexMilestones === undefined) globalProgression.claimedCodexMilestones = {};
                 if(!player.equippedUsables) player.equippedUsables = [null, null, null, null, null, null, null, null];
+                if(globalProgression.equipped && globalProgression.equipped.cape === undefined) globalProgression.equipped.cape = null;
+                if(!globalProgression.skillTreeEnhancements) globalProgression.skillTreeEnhancements = [];
 
                 if (globalProgression.lastQuestDate !== new Date().toDateString()) {
                     globalProgression.questsCompletedToday = 0;
@@ -1294,24 +1301,52 @@
             if((globalProgression.wellDropBattles || 0) > 0) globalProgression.wellDropBattles--;
         }
         
-        function getGearScore(stats) {
-            if(!stats) return 0;
-            return (stats.hp||0)/10 + (stats.dmg||0)*2 + (stats.def||0)*5;
+        function getGearScore(item) {
+            if(!item) return 0;
+            if(item.bonuses) {
+                let score = 0;
+                item.bonuses.forEach(b => {
+                    switch(b.stat) {
+                        case 'health': score += b.value / 10; break;
+                        case 'attackDamage': score += b.value * 2; break;
+                        case 'damageReduction': score += b.value * 500; break;
+                        case 'critRate': score += b.value * 200; break;
+                        case 'critDamage': score += b.value * 100; break;
+                        case 'reflect': score += b.value * 500; break;
+                        case 'hpRegen': score += b.value * 500; break;
+                        case 'dodge': score += b.value * 200; break;
+                        case 'hit': score += b.value * 200; break;
+                        case 'skillCdReduction': score += b.value * 10; break;
+                    }
+                });
+                return score;
+            }
+            // Legacy items with old stats
+            if(item.stats) return (item.stats.hp||0)/10 + (item.stats.dmg||0)*2 + (item.stats.def||0)*5;
+            return 0;
         }
         
         function hasBetterGear(slot) {
             let eq = globalProgression.equipped[slot];
-            let eqGS = eq ? getGearScore(eq.stats) : -1;
+            let eqGS = eq ? getGearScore(eq) : -1;
             let baseSlot = slot.startsWith('ring') ? 'ring' : slot;
-            let betterInInv = globalProgression.equipInventory.some(i => i.type === baseSlot && getGearScore(i.stats) > eqGS);
+            let betterInInv = globalProgression.equipInventory.some(i => i.type === baseSlot && getGearScore(i) > eqGS);
             return betterInInv;
         }
 
         function getEquipStats() {
-            let stats = { hp: 0, dmg: 0, def: 0 };
+            let stats = { health: 0, attackDamage: 0, damageReduction: 0, critRate: 0, critDamage: 0, reflect: 0, hpRegen: 0, dodge: 0, hit: 0, skillCdReduction: 0 };
             if(!globalProgression.equipped) return stats;
             Object.values(globalProgression.equipped).forEach(item => {
-                if(item && item.stats) { stats.hp += (item.stats.hp || 0); stats.dmg += (item.stats.dmg || 0); stats.def += (item.stats.def || 0); }
+                if(item && item.bonuses) {
+                    item.bonuses.forEach(b => {
+                        if(stats[b.stat] !== undefined) stats[b.stat] += b.value;
+                    });
+                } else if(item && item.stats) {
+                    // Legacy item support
+                    stats.health += (item.stats.hp || 0);
+                    stats.attackDamage += (item.stats.dmg || 0);
+                }
             });
             return stats;
         }
@@ -1319,13 +1354,13 @@
         function calculateMaxHp() {
             let equipStats = getEquipStats();
             let a = globalProgression.attributes;
-            return player.data.baseHp + ((player.lvl - 1) * 15) + (a.hp * 12) + (a.tenacity * 2) + (a.agility * 2) + (a.resistance * 2) + player.treeBonusHp + equipStats.hp;
+            return player.data.baseHp + ((player.lvl - 1) * 15) + (a.hp * 12) + (a.tenacity * 2) + (a.agility * 2) + (a.resistance * 2) + player.treeBonusHp + equipStats.health;
         }
 
         function getBaseDamage() {
             let equipStats = getEquipStats();
             let a = globalProgression.attributes;
-            return player.data.baseDmg + (a.willpower * 3) + (a.agility * 1) + (a.reflexes * 1) + player.treeBonusDmg + equipStats.dmg;
+            return player.data.baseDmg + (a.willpower * 3) + (a.agility * 1) + (a.reflexes * 1) + player.treeBonusDmg + equipStats.attackDamage;
         }
         
         function getPlayerDef() {
@@ -1398,11 +1433,12 @@
                 lastHpRegenTime: Date.now(), enemyKillCounts: {}, claimedCodexMilestones: {},
                 totalExpEarned: 0, cooldowns: { herbs: 0, mine: 0, fish: 0 },
                 inventory: { ench_common: 0, ench_rare: 0, ench_epic: 0, ench_legendary: 0, herb_red: 0, herb_blue: 0, fish_1: 0, fish_2: 0, fish_3: 0, fish_4: 0, fish_5: 0, fish_6: 0, soul_pebbles: 0, pot_i1: 20, pot_i2: 0, pot_i3: 0, pot_r1: 0, pot_r2: 0, pot_r3: 0, food_d1: 0, food_d2: 0, food_d3: 0, food_df1: 0, food_df2: 0, food_df3: 0 },
-                equipInventory: [], equipped: { head: null, shoulders: null, chest: null, arms: null, waist: null, legs: null, boots: null, necklace: null, ring1: null, ring2: null, ring3: null, ring4: null, weapon: null }, newItems: {},
-                shopGear: [], shopLastRefresh: 0, attributes: { hp: 1, tenacity: 1, agility: 1, willpower: 1, resistance: 1, reflexes: 1, fury: 1, devastation: 0 },
+                equipInventory: [], equipped: { head: null, shoulders: null, chest: null, arms: null, waist: null, legs: null, boots: null, necklace: null, ring1: null, ring2: null, ring3: null, ring4: null, weapon: null, cape: null }, newItems: {},
+                shopGear: [], shopLastRefresh: 0, attributes: Object.assign({}, CLASS_BASE_ATTRIBUTES[classId] || { hp: 1, tenacity: 1, agility: 1, willpower: 1, resistance: 1, reflexes: 1, fury: 1, devastation: 0 }),
                 storyModeProgress: { hunting: 0, pillage: 0, workshop: 0 },
                 settings: { sound: true, music: true },
-                discoveredEnemies: {}, claimedCodexRewards: {}, killedBosses: {}
+                discoveredEnemies: {}, claimedCodexRewards: {}, killedBosses: {},
+                skillTreeEnhancements: []
             };
             player = {
                 classId: classId, data: CLASSES[classId], lvl: 1, xp: 0, maxHp: 0, currentHp: 0, shield: 0, 
@@ -1572,21 +1608,24 @@
             const lvlEl = document.getElementById('char-lvl'); if (lvlEl) lvlEl.innerText = player.lvl;
             
             let eqStats = getEquipStats();
-            document.getElementById('char-stat-hp').innerText = `${calculateMaxHp()} (+${eqStats.hp})`;
-            document.getElementById('char-stat-dmg').innerText = `${getBaseDamage()} (+${eqStats.dmg})`;
-            document.getElementById('char-stat-def').innerText = `${getPlayerDef()} (+${eqStats.def})`;
+            document.getElementById('char-stat-hp').innerText = `${calculateMaxHp()} (+${eqStats.health})`;
+            document.getElementById('char-stat-dmg').innerText = `${getBaseDamage()} (+${eqStats.attackDamage})`;
+            document.getElementById('char-stat-def').innerText = `${getPlayerDef()}`;
             
             let a = globalProgression.attributes;
-            let hpRegenAmt = Math.floor(player.maxHp * (a.hp * 0.0001));
+            let hpRegenAmt = Math.floor(player.maxHp * (a.hp * 0.0001 + eqStats.hpRegen));
             document.getElementById('char-stat-regen').innerText = `${(player.treeBonusRegen || 0) + hpRegenAmt} HP/Turn`;
-            document.getElementById('char-stat-gs').innerText = (eqStats.hp/10 + eqStats.dmg*2 + eqStats.def*5).toFixed(0);
 
-            document.getElementById('char-stat-dodge').innerText = `${(a.resistance * 0.1).toFixed(1)}%`;
-            document.getElementById('char-stat-hit').innerText = `${(a.reflexes * 0.1).toFixed(1)}%`;
-            document.getElementById('char-stat-crit').innerText = `${Math.min(75, 5 + (a.reflexes * 1)).toFixed(0)}%`;
-            document.getElementById('char-stat-critdmg').innerText = `${(150 + (a.fury * 1)).toFixed(0)}%`;
-            document.getElementById('char-stat-dmgred').innerText = `${(a.tenacity * 0.1).toFixed(1)}%`;
-            document.getElementById('char-stat-reflect').innerText = `${(a.tenacity * 0.01).toFixed(2)}%`;
+            let totalGs = 0;
+            Object.values(globalProgression.equipped).forEach(item => { if(item) totalGs += getGearScore(item); });
+            document.getElementById('char-stat-gs').innerText = totalGs.toFixed(0);
+
+            document.getElementById('char-stat-dodge').innerText = `${((a.resistance * 0.1) + (eqStats.dodge * 100)).toFixed(1)}%`;
+            document.getElementById('char-stat-hit').innerText = `${((a.reflexes * 0.1) + (eqStats.hit * 100)).toFixed(1)}%`;
+            document.getElementById('char-stat-crit').innerText = `${Math.min(75, (a.reflexes * 1) + (eqStats.critRate * 100)).toFixed(1)}%`;
+            document.getElementById('char-stat-critdmg').innerText = `${((a.fury * 1) + (a.willpower * 0.5) + (eqStats.critDamage * 100)).toFixed(1)}%`;
+            document.getElementById('char-stat-dmgred').innerText = `${((a.tenacity * 0.1) + (eqStats.damageReduction * 100)).toFixed(1)}%`;
+            document.getElementById('char-stat-reflect').innerText = `${((a.tenacity * 0.01) + (eqStats.reflect * 100)).toFixed(2)}%`;
             document.getElementById('char-stat-skilldmg').innerText = `${(a.agility * 0.1).toFixed(1)}%`;
             document.getElementById('char-stat-mitigation').innerText = `${Math.min(70, a.resistance * 0.1).toFixed(1)}%`;
             
@@ -1606,7 +1645,7 @@
                 } else {
                     el.dataset.filled = "false"; el.className = `equip-slot`;
                     let icon = '💍';
-                    if(slot === 'head') icon = '🪖'; else if (slot === 'shoulders') icon = '🛡️'; else if (slot === 'arms') icon = '🦾'; else if (slot === 'weapon') icon = '⚔️'; else if (slot === 'chest') icon = '🦺'; else if (slot === 'waist') icon = '🪢'; else if (slot === 'legs') icon = '👖'; else if (slot === 'boots') icon = '🥾'; else if (slot === 'necklace') icon = '📿';
+                    if(slot === 'head') icon = '🪖'; else if (slot === 'shoulders') icon = '🛡️'; else if (slot === 'arms') icon = '🦾'; else if (slot === 'weapon') icon = player.classId === 'mage' ? '🪄' : '🪓'; else if (slot === 'chest') icon = '🦺'; else if (slot === 'waist') icon = '🪢'; else if (slot === 'legs') icon = '👖'; else if (slot === 'boots') icon = '🥾'; else if (slot === 'necklace') icon = '📿'; else if (slot === 'cape') icon = '🧣';
                     el.innerHTML = badge + icon;
                 }
             });
@@ -1652,8 +1691,10 @@
             ];
 
             attrDefs.forEach(a => {
-                let currentVal = globalProgression.attributes[a.id] || (a.id === 'devastation' ? 0 : 1);
-                let minVal = a.id === 'devastation' ? 0 : 1;
+                let classBase = (CLASS_BASE_ATTRIBUTES[player.classId] || {})[a.id];
+                let baseMin = a.id === 'devastation' ? 0 : (classBase !== undefined ? classBase : 1);
+                let currentVal = globalProgression.attributes[a.id] || baseMin;
+                let minVal = baseMin;
                 let isDevastation = a.id === 'devastation';
                 let isWillpower = a.id === 'willpower';
                 let cost = isDevastation ? 5 : 1;
@@ -1736,7 +1777,8 @@
 
         function deallocateAttribute(id, count) {
             count = count || 1;
-            let minVal = id === 'devastation' ? 0 : 1;
+            let classBase = (CLASS_BASE_ATTRIBUTES[player.classId] || {})[id];
+            let minVal = id === 'devastation' ? 0 : (classBase !== undefined ? classBase : 1);
             let currentVal = globalProgression.attributes[id] || minVal;
             let canRemove = Math.min(count, currentVal - minVal);
             if (canRemove <= 0) return;
@@ -1745,7 +1787,9 @@
                 player.statPoints += canRemove * 5;
                 globalProgression.attributes['devastation'] = currentVal - canRemove;
                 ['hp', 'tenacity', 'agility', 'willpower', 'resistance', 'reflexes', 'fury'].forEach(stat => {
-                    globalProgression.attributes[stat] = Math.max(1, (globalProgression.attributes[stat] || 1) - canRemove);
+                    let statClassBase = (CLASS_BASE_ATTRIBUTES[player.classId] || {})[stat];
+                    let statMin = statClassBase !== undefined ? statClassBase : 1;
+                    globalProgression.attributes[stat] = Math.max(statMin, (globalProgression.attributes[stat] || statMin) - canRemove);
                 });
             } else {
                 player.statPoints += canRemove;
@@ -1760,12 +1804,14 @@
 
         function respecAttributes() {
             const normalAttrs = ['hp', 'tenacity', 'agility', 'willpower', 'resistance', 'reflexes', 'fury'];
+            let baseAttrs = CLASS_BASE_ATTRIBUTES[player.classId] || {};
             let devVal = globalProgression.attributes['devastation'] || 0;
             let totalRefund = devVal * 5;
             normalAttrs.forEach(stat => {
-                let currentVal = globalProgression.attributes[stat] || 1;
-                totalRefund += Math.max(0, currentVal - 1 - devVal);
-                globalProgression.attributes[stat] = 1;
+                let minVal = baseAttrs[stat] !== undefined ? baseAttrs[stat] : 1;
+                let currentVal = globalProgression.attributes[stat] || minVal;
+                totalRefund += Math.max(0, currentVal - minVal - devVal);
+                globalProgression.attributes[stat] = minVal;
             });
             globalProgression.attributes['devastation'] = 0;
             player.statPoints += totalRefund;
@@ -1793,7 +1839,7 @@
                 let eqCard = document.createElement('div');
                 eqCard.className = `bg-gray-800 border-2 rarity-${currentEq.rarity} p-3 rounded-lg flex justify-between items-center mb-2`;
                 let enchTxt = currentEq.enchanted ? `<span class="text-yellow-300 ml-1 text-xs">(${currentEq.enchanted})</span>` : '';
-                eqCard.innerHTML = `<div class="flex items-center gap-2"><span class="text-2xl">${currentEq.icon}</span><div><div class="font-bold text-white">${currentEq.name} ${enchTxt} <span class="text-[10px] text-gray-500 uppercase">${currentEq.rarity}</span></div><div class="text-xs text-green-400">HP +${currentEq.stats.hp} | DMG +${currentEq.stats.dmg} | DEF +${currentEq.stats.def}</div></div></div><button onclick="unequipCurrent()" class="bg-red-900 hover:bg-red-800 text-red-200 px-3 py-2 rounded text-xs font-bold transition active:scale-95 border border-red-700">Unequip</button>`;
+                eqCard.innerHTML = `<div class="flex items-center gap-2"><span class="text-2xl">${currentEq.icon}</span><div><div class="font-bold text-white">${currentEq.name} ${enchTxt} <span class="text-[10px] text-gray-500 uppercase">${currentEq.rarity}</span></div><div class="text-xs text-green-400">${formatBonuses(currentEq.bonuses, currentEq.stats)}</div></div></div><button onclick="unequipCurrent()" class="bg-red-900 hover:bg-red-800 text-red-200 px-3 py-2 rounded text-xs font-bold transition active:scale-95 border border-red-700">Unequip</button>`;
                 eqSection.appendChild(eqCard);
             } else {
                 eqSection.innerHTML += `<div class="text-gray-400 text-center py-2 text-sm italic bg-gray-900 rounded-lg">Nothing Equipped</div>`;
@@ -1808,16 +1854,16 @@
                 invSection.innerHTML += `<div class="text-gray-500 text-center py-4 text-sm bg-gray-900 rounded-lg">No items in bag for this slot.</div>`; 
             } else {
                 // Sort by gear score
-                invItems.sort((a,b) => getGearScore(b.stats) - getGearScore(a.stats));
+                invItems.sort((a,b) => getGearScore(b) - getGearScore(a));
                 invItems.forEach(item => {
                     let btn = document.createElement('div');
-                    let isUpgrade = currentEq ? getGearScore(item.stats) > getGearScore(currentEq.stats) : true;
+                    let isUpgrade = currentEq ? getGearScore(item) > getGearScore(currentEq) : true;
                     btn.className = `bg-gray-900 border-2 rarity-${item.rarity} p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-700 transition mb-2 relative`;
                     
                     let upgradeBadge = isUpgrade ? `<span class="absolute -top-2 -left-2 bg-green-600 text-white text-[10px] px-1 rounded shadow border border-green-400 font-bold tracking-widest">UPGRADE</span>` : '';
                     let enchTxt = item.enchanted ? `<span class="text-yellow-300 ml-1 text-xs">(${item.enchanted})</span>` : '';
                     
-                    btn.innerHTML = `${upgradeBadge}<div class="flex items-center gap-2"><span class="text-2xl">${item.icon || '📦'}</span><div><div class="font-bold text-white">${item.name} ${enchTxt} <span class="text-[10px] text-gray-500 uppercase">${item.rarity}</span></div><div class="text-xs text-green-400">HP +${item.stats.hp} | DMG +${item.stats.dmg} | DEF +${item.stats.def}</div></div></div><button class="bg-blue-800 hover:bg-blue-700 text-blue-200 px-4 py-2 rounded text-xs font-bold border border-blue-600 transition active:scale-95">Equip</button>`;
+                    btn.innerHTML = `${upgradeBadge}<div class="flex items-center gap-2"><span class="text-2xl">${item.icon || '📦'}</span><div><div class="font-bold text-white">${item.name} ${enchTxt} <span class="text-[10px] text-gray-500 uppercase">${item.rarity}</span></div><div class="text-xs text-green-400">${formatBonuses(item.bonuses, item.stats)}</div></div></div><button class="bg-blue-800 hover:bg-blue-700 text-blue-200 px-4 py-2 rounded text-xs font-bold border border-blue-600 transition active:scale-95">Equip</button>`;
                     btn.onclick = (e) => { if(e.target.tagName !== 'BUTTON') return; equipItem(item.id); }; 
                     invSection.appendChild(btn);
                 });
@@ -1843,12 +1889,12 @@
             EQUIP_SLOTS.forEach(slot => {
                 let baseSlot = slot.startsWith('ring') ? 'ring' : slot;
                 let currentEq = globalProgression.equipped[slot];
-                let currentGS = currentEq ? getGearScore(currentEq.stats) : -1;
+                let currentGS = currentEq ? getGearScore(currentEq) : -1;
                 let bestIdx = -1;
                 let bestGS = currentGS;
                 inventory.forEach((item, idx) => {
                     if(item.type === baseSlot) {
-                        let gs = getGearScore(item.stats);
+                        let gs = getGearScore(item);
                         if(gs > bestGS) { bestGS = gs; bestIdx = idx; }
                     }
                 });
@@ -1879,8 +1925,31 @@
             }
         }
 
+        function formatBonuses(bonuses, legacyStats) {
+            if(bonuses && bonuses.length > 0) {
+                return bonuses.map(b => {
+                    switch(b.stat) {
+                        case 'health': return `HP +${b.value}`;
+                        case 'attackDamage': return `ATK +${b.value}`;
+                        case 'damageReduction': return `DMG Red +${(b.value*100).toFixed(1)}%`;
+                        case 'critRate': return `Crit +${(b.value*100).toFixed(1)}%`;
+                        case 'critDamage': return `CritDMG +${(b.value*100).toFixed(1)}%`;
+                        case 'reflect': return `Reflect +${(b.value*100).toFixed(2)}%`;
+                        case 'hpRegen': return `Regen +${(b.value*100).toFixed(2)}%`;
+                        case 'dodge': return `Dodge +${(b.value*100).toFixed(1)}%`;
+                        case 'hit': return `Hit +${(b.value*100).toFixed(1)}%`;
+                        case 'skillCdReduction': return `CD -${b.value}t`;
+                        default: return `${b.stat} +${b.value}`;
+                    }
+                }).join(' | ');
+            }
+            // Legacy display
+            if(legacyStats) return `HP +${legacyStats.hp||0} | DMG +${legacyStats.dmg||0} | DEF +${legacyStats.def||0}`;
+            return '';
+        }
+
         function rollEquipment(forcedRarity = null) {
-            let slotTypes = ['head', 'shoulders', 'chest', 'arms', 'waist', 'legs', 'boots', 'necklace', 'ring', 'weapon'];
+            let slotTypes = ['head', 'shoulders', 'chest', 'arms', 'waist', 'legs', 'boots', 'necklace', 'ring', 'weapon', 'cape'];
             let sType = slotTypes[Math.floor(Math.random() * slotTypes.length)];
             
             let r = 'common';
@@ -1891,21 +1960,56 @@
                 else if (rarityRoll < 0.11) r = 'epic';
                 else if (rarityRoll < 0.31) r = 'rare';
             }
-            
-            let mult = RARITY_MULTS[r]; 
-            let totalPts = player.lvl * mult;
+
+            // Determine icon and name based on type and class
+            let icon, itemName;
+            if (sType === 'weapon') {
+                icon = player.classId === 'mage' ? '🪄' : '🪓';
+                let wName = player.classId === 'mage' ? 'Staff' : 'Axe';
+                itemName = `${r.charAt(0).toUpperCase() + r.slice(1)} ${wName}`;
+            } else {
+                icon = sType==='head'?'🪖':sType==='shoulders'?'🛡️':sType==='chest'?'🦺':sType==='arms'?'🦾':sType==='waist'?'🪢':sType==='legs'?'👖':sType==='boots'?'🥾':sType==='necklace'?'📿':sType==='ring'?'💍':sType==='cape'?'🧣':'💍';
+                itemName = `${r.charAt(0).toUpperCase() + r.slice(1)} ${sType}`;
+            }
+
+            // Rarity config
+            const rarityBonusCount = { common: 1, rare: 2, epic: 3, legendary: 4 };
+            const rarityStatMult  = { common: 1, rare: 1, epic: 2, legendary: 3 };
+            let statMult = rarityStatMult[r];
+            let bonusCount = rarityBonusCount[r];
+            let lvl = player.lvl;
+
+            // Stat pool (base values are in their natural decimal/flat forms for combat use)
+            let statPool = [
+                { stat: 'health',          getValue: (l, m) => Math.round((3 + l * 0.5) * m) },
+                { stat: 'damageReduction', getValue: (l, m) => Math.round(0.001 * m * 1000) / 1000 },
+                { stat: 'attackDamage',    getValue: (l, m) => Math.round((1 + l * 0.2) * m) },
+                { stat: 'critRate',        getValue: (l, m) => Math.round(0.001 * m * 1000) / 1000 },
+                { stat: 'critDamage',      getValue: (l, m) => Math.round(0.001 * m * 1000) / 1000 },
+                { stat: 'reflect',         getValue: (l, m) => Math.round(0.0001 * m * 10000) / 10000 },
+                { stat: 'hpRegen',         getValue: (l, m) => Math.round(0.0001 * m * 10000) / 10000 },
+                { stat: 'dodge',           getValue: (l, m) => Math.round(0.001 * m * 1000) / 1000 },
+                { stat: 'hit',             getValue: (l, m) => Math.round(0.001 * m * 1000) / 1000 },
+            ];
+            // Rarity-specific skill CD reduction (only one per rarity)
+            if (r === 'rare')      statPool.push({ stat: 'skillCdReduction', getValue: () => 1 });
+            else if (r === 'epic') statPool.push({ stat: 'skillCdReduction', getValue: () => 2 });
+            else if (r === 'legendary') statPool.push({ stat: 'skillCdReduction', getValue: () => 3 });
+
+            // Pick random stats without duplicates
+            let pool = [...statPool];
+            let bonuses = [];
+            for (let i = 0; i < bonusCount && pool.length > 0; i++) {
+                let idx = Math.floor(Math.random() * pool.length);
+                let statDef = pool.splice(idx, 1)[0];
+                bonuses.push({ stat: statDef.stat, value: statDef.getValue(lvl, statMult) });
+            }
 
             let e = {
-                id: 'eq_' + Date.now() + Math.floor(Math.random()*1000), type: sType, rarity: r, name: `${r.toUpperCase()} ${sType}`,
-                icon: sType==='head'?'🪖':sType==='shoulders'?'🛡️':sType==='chest'?'🦺':sType==='arms'?'🦾':sType==='waist'?'🪢':sType==='legs'?'👖':sType==='boots'?'🥾':sType==='necklace'?'📿':sType==='ring'?'💍':'⚔️',
-                stats: { hp: 0, dmg: 0, def: 0 },
-                enchanted: false
+                id: 'eq_' + Date.now() + Math.floor(Math.random()*1000),
+                type: sType, rarity: r, name: itemName, icon: icon,
+                bonuses: bonuses, enchanted: false
             };
-            
-            if (sType === 'weapon') { e.stats.dmg = totalPts; }
-            else if (sType === 'chest' || sType === 'legs') { e.stats.hp = totalPts * 5; e.stats.def = Math.ceil(totalPts * 0.2); }
-            else if (sType === 'head' || sType === 'shoulders' || sType === 'boots' || sType === 'arms' || sType === 'waist') { e.stats.hp = totalPts * 2; e.stats.def = Math.ceil(totalPts * 0.5); }
-            else if (sType === 'necklace' || sType === 'ring') { e.stats.dmg = Math.ceil(totalPts * 0.5); e.stats.hp = totalPts; }
 
             return e;
         }
@@ -2143,7 +2247,7 @@
                     let enchStatus = eq.enchanted ? `<span class="text-xs text-yellow-300 bg-gray-900 px-2 py-1 rounded">(${eq.enchanted})</span>` : 
                         `<button onclick="openEnchantModal('${slot}')" class="bg-purple-700 hover:bg-purple-600 text-white px-4 py-2 rounded text-xs font-bold transition active:scale-95 shadow-md">Enchant</button>`;
                     
-                    btn.innerHTML = `<div class="flex items-center gap-2"><span class="text-3xl">${eq.icon}</span><div><div class="font-bold text-white">${eq.name}</div><div class="text-xs text-green-400">HP +${eq.stats.hp} | DMG +${eq.stats.dmg} | DEF +${eq.stats.def}</div></div></div> ${enchStatus}`;
+                    btn.innerHTML = `<div class="flex items-center gap-2"><span class="text-3xl">${eq.icon}</span><div><div class="font-bold text-white">${eq.name}</div><div class="text-xs text-green-400">${formatBonuses(eq.bonuses, eq.stats)}</div></div></div> ${enchStatus}`;
                     document.getElementById('ench-list').appendChild(btn);
                 }
             });
@@ -2195,9 +2299,19 @@
             if(eq && !eq.enchanted && globalProgression.inventory[coreId] > 0) {
                 globalProgression.inventory[coreId]--;
                 eq.enchanted = coreName;
-                eq.stats.hp = Math.floor(eq.stats.hp * mult) + (eq.stats.hp > 0 ? 1 : 0);
-                eq.stats.dmg = Math.floor(eq.stats.dmg * mult) + (eq.stats.dmg > 0 ? 1 : 0);
-                eq.stats.def = Math.floor(eq.stats.def * mult) + (eq.stats.def > 0 ? 1 : 0);
+                if(eq.bonuses) {
+                    eq.bonuses.forEach(b => {
+                        if(b.stat === 'health' || b.stat === 'attackDamage' || b.stat === 'skillCdReduction') {
+                            b.value = Math.floor(b.value * mult) + (b.value > 0 ? 1 : 0);
+                        } else {
+                            b.value = Math.round(b.value * mult * 100000) / 100000;
+                        }
+                    });
+                } else if(eq.stats) {
+                    eq.stats.hp = Math.floor(eq.stats.hp * mult) + (eq.stats.hp > 0 ? 1 : 0);
+                    eq.stats.dmg = Math.floor(eq.stats.dmg * mult) + (eq.stats.dmg > 0 ? 1 : 0);
+                    eq.stats.def = Math.floor(eq.stats.def * mult) + (eq.stats.def > 0 ? 1 : 0);
+                }
                 playSound('win'); player.maxHp = calculateMaxHp(); saveGame(); closeEnchantModal();
             }
         }
@@ -2274,7 +2388,7 @@
                     div.innerHTML = `<div class="flex items-center gap-2"><span class="text-2xl">${g.item.icon}</span><span class="text-gray-500 line-through">${g.item.name}</span></div> <span class="text-xs font-bold text-gray-500">SOLD OUT</span>`;
                 } else {
                     div.className = `bg-gray-800 border-2 rarity-${g.item.rarity} p-3 rounded-lg flex justify-between items-center shadow-md`;
-                    div.innerHTML = `<div class="flex items-center gap-2"><span class="text-2xl">${g.item.icon}</span><div><div class="font-bold text-white">${g.item.name} <span class="text-[10px] text-gray-500 uppercase">${g.item.rarity}</span></div><div class="text-xs text-green-400">HP +${g.item.stats.hp} | DMG +${g.item.stats.dmg} | DEF +${g.item.stats.def}</div></div></div><button onclick="buyShopGear(${idx})" class="bg-blue-800 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-bold transition active:scale-95 shadow-md flex items-center gap-1"><span>Buy</span><span class="text-yellow-400">💰${g.cost}</span></button>`;
+                    div.innerHTML = `<div class="flex items-center gap-2"><span class="text-2xl">${g.item.icon}</span><div><div class="font-bold text-white">${g.item.name} <span class="text-[10px] text-gray-500 uppercase">${g.item.rarity}</span></div><div class="text-xs text-green-400">${formatBonuses(g.item.bonuses, g.item.stats)}</div></div></div><button onclick="buyShopGear(${idx})" class="bg-blue-800 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-bold transition active:scale-95 shadow-md flex items-center gap-1"><span>Buy</span><span class="text-yellow-400">💰${g.cost}</span></button>`;
                 }
                 gearList.appendChild(div);
             });
@@ -3091,7 +3205,8 @@
         function processRegenAndBuffs() {
             let healMult = player.activeBuffs.some(b => b.type === 'poison') ? 0.5 : 1.0;
             let a = globalProgression.attributes;
-            let hpRegenAmt = Math.floor(player.maxHp * (a.hp * 0.0001));
+            let eqStats = getEquipStats();
+            let hpRegenAmt = Math.floor(player.maxHp * (a.hp * 0.0001 + eqStats.hpRegen));
             let treeRegen = Math.floor(((player.treeBonusRegen || 0) + hpRegenAmt) * healMult);
             
             if (treeRegen > 0 && player.currentHp < player.maxHp) {
@@ -3137,6 +3252,7 @@
             let buffDmgMult = 1.0; 
             if (player.activeBuffs) player.activeBuffs.filter(b => b.type === 'dmg').forEach(b => buffDmgMult *= b.val);
             let a = globalProgression.attributes;
+            let eqStats = getEquipStats();
             let skillDmgMult = 1 + (a.agility * 0.001);
             
             let scaledPower = Math.max(1, Math.floor(baseDmg * skill.mult * buffDmgMult * skillDmgMult));
@@ -3168,7 +3284,7 @@
 
                         setTimeout(() => triggerAnim(`enemy-card-${tIdx}`, 'anim-shake'), 150 * (i+1));
                         
-                        let hitChance = 0.95 + (a.reflexes * 0.001);
+                        let hitChance = 0.95 + (a.reflexes * 0.001) + eqStats.hit;
                         if(target.dodgeTurns > 0 || Math.random() > hitChance) {
                             addLog(`Missed ${target.name}!`, "text-gray-500");
                             showFloatText(`enemy-card-${tIdx}`, `MISS`, 'text-gray-400');
@@ -3185,10 +3301,10 @@
 
                         if (target.shield > 0) { hitDmg = Math.floor(hitDmg * (1 - target.shield)); target.shield = 0; }
                         
-                        let critChance = Math.min(0.75, 0.05 + (a.reflexes * 0.01));
+                        let critChance = Math.min(0.75, (a.reflexes * 0.01) + eqStats.critRate);
                         let isCrit = Math.random() < critChance;
                         if(isCrit) {
-                            let critMult = 1.5 + (a.fury * 0.01);
+                            let critMult = 1 + (a.fury * 0.01) + (a.willpower * 0.005) + eqStats.critDamage;
                             hitDmg = Math.floor(hitDmg * critMult);
                             addLog(`CRITICAL HIT!`, "text-yellow-400 font-bold");
                         }
@@ -3243,7 +3359,7 @@
                 }
             }
 
-            player.skillCooldowns[skillIdx] = skill.cd + 1; 
+            player.skillCooldowns[skillIdx] = Math.max(0, skill.cd + 1 - (eqStats.skillCdReduction || 0)); 
             updateCombatUI(); renderSkills();
             
             let enemyDelay = currentMode === 'quest' ? 200 : 800;
@@ -3364,7 +3480,8 @@
 
         function dealDamageToPlayer(baseDmg, attackerEnemy) {
             let a = globalProgression.attributes;
-            let dodgeChance = a.resistance * 0.001;
+            let eqStats = getEquipStats();
+            let dodgeChance = a.resistance * 0.001 + eqStats.dodge;
             if(player.dodgeTurns > 0 || Math.random() < dodgeChance) {
                 addLog(`You dodged!`, "text-gray-400 font-bold");
                 showFloatText('player-avatar-container', `DODGE`, 'text-gray-400');
@@ -3385,7 +3502,8 @@
             let buffDefMult = 1.0; 
             if (player.activeBuffs) player.activeBuffs.filter(b => b.type === 'def' || b.type === 'def_down').forEach(b => buffDefMult *= b.val);
             
-            let tenacityReduction = 1 - (a.tenacity * 0.001);
+            let dmgReductionTotal = Math.min(0.9, (a.tenacity * 0.001) + eqStats.damageReduction);
+            let tenacityReduction = 1 - dmgReductionTotal;
             let dmg = Math.floor(baseDmg * tenacityReduction);
             
             if (player.shield > 0) { dmg = Math.floor(dmg * (1 - player.shield)); player.shield = 0; }
@@ -3405,8 +3523,8 @@
             player.currentHp -= dmg;
             showFloatText('player-avatar-container', `-${dmg}`, 'text-red-500');
 
-            // Reflect
-            let reflectPct = a.tenacity * 0.0001;
+            // Reflect (tenacity attribute + gear reflect)
+            let reflectPct = a.tenacity * 0.0001 + eqStats.reflect;
             let fireShieldActive = player.activeBuffs && player.activeBuffs.some(b => b.type === 'fire_shield');
             if(fireShieldActive) reflectPct += 0.01;
 
