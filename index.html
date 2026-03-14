@@ -18,7 +18,9 @@
         .fighter-avatar { font-size: 3rem; text-align: center; display: inline-block; position: relative; }
         .enemy-card { transition: all 0.2s; position: relative; }
         .enemy-target { transform: scale(1.05); background: #374151; border-color: #ef4444 !important; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5) !important; }
-        .enemy-dead { opacity: 0.3; filter: grayscale(100%); pointer-events: none; }
+        .enemy-dead { opacity: 0.5; filter: grayscale(80%); pointer-events: none; }
+        .enemy-death-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2.5rem; filter: drop-shadow(0 0 10px #ef4444) drop-shadow(0 0 20px #991b1b); animation: death-pulse 2s infinite ease-in-out; z-index: 10; pointer-events: none; }
+        @keyframes death-pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; filter: drop-shadow(0 0 10px #ef4444) drop-shadow(0 0 20px #991b1b); } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; filter: drop-shadow(0 0 20px #ef4444) drop-shadow(0 0 30px #991b1b) drop-shadow(0 0 40px #7f1d1d); } }
         
         .skill-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
         ::-webkit-scrollbar { width: 6px; }
@@ -34,20 +36,25 @@
         @keyframes float-up { 0% { opacity: 1; transform: translate(-50%, 0) scale(1); } 100% { opacity: 0; transform: translate(-50%, -40px) scale(1.3); } }
         .float-text { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-weight: 900; font-size: 1.8rem; animation: float-up 0.9s ease-out forwards; pointer-events: none; z-index: 100; text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 10px rgba(0,0,0,0.8); }
 
-        @keyframes anim-strike { 0% { transform: scale(1) translate(0, 0); } 50% { transform: scale(1.3) translate(20px, -20px); filter: brightness(1.5); } 100% { transform: scale(1) translate(0, 0); } }
-        @keyframes anim-shake { 0%, 100% { transform: translateX(0); filter: hue-rotate(0deg) brightness(1); } 25% { transform: translateX(-8px); filter: hue-rotate(-50deg) brightness(0.5) text-shadow(0 0 10px red); } 75% { transform: translateX(8px); filter: hue-rotate(-50deg) brightness(0.5) text-shadow(0 0 10px red); } }
-        @keyframes anim-heal { 0% { filter: drop-shadow(0 0 0px #10b981); transform: scale(1); } 50% { filter: drop-shadow(0 0 20px #10b981); transform: scale(1.1); } 100% { filter: drop-shadow(0 0 0px #10b981); transform: scale(1); } }
+        @keyframes anim-strike { 0% { transform: translateY(0) scale(1) rotate(0deg); filter: brightness(1); } 15% { transform: translateY(-15px) scale(1.3) rotate(-5deg); filter: brightness(1.5) drop-shadow(0 0 15px rgba(255,100,0,0.8)); } 30% { transform: translateY(5px) scale(0.95) rotate(2deg); filter: brightness(0.8); } 50% { transform: translateY(-5px) scale(1.1) rotate(-1deg); filter: brightness(1.2) drop-shadow(0 0 8px rgba(255,200,0,0.5)); } 100% { transform: translateY(0) scale(1) rotate(0deg); filter: brightness(1); } }
+        @keyframes anim-shake { 0%, 100% { transform: translateX(0) scale(1); filter: brightness(1); } 10% { transform: translateX(-10px) scale(1.05); filter: brightness(0.5) sepia(1) hue-rotate(-50deg); } 20% { transform: translateX(10px) scale(0.98); filter: brightness(1.3); } 30% { transform: translateX(-8px); filter: brightness(0.6) sepia(1) hue-rotate(-50deg); } 40% { transform: translateX(8px); filter: brightness(1.1); } 50% { transform: translateX(-5px) scale(1.02); filter: brightness(0.7); } 60% { transform: translateX(5px); filter: brightness(1); } 70% { transform: translateX(-3px); } 80% { transform: translateX(3px); } 90% { transform: translateX(-1px); } }
+        @keyframes anim-heal { 0% { filter: drop-shadow(0 0 0px #10b981); transform: scale(1); } 25% { filter: drop-shadow(0 0 15px #10b981) drop-shadow(0 0 30px #059669); transform: scale(1.15); } 50% { filter: drop-shadow(0 0 25px #10b981) drop-shadow(0 0 40px #34d399) brightness(1.3); transform: scale(1.1); } 75% { filter: drop-shadow(0 0 15px #fbbf24) drop-shadow(0 0 25px #10b981); transform: scale(1.05); } 100% { filter: drop-shadow(0 0 0px #10b981); transform: scale(1); } }
+        @keyframes anim-crit { 0% { transform: scale(1); filter: brightness(1); } 20% { transform: scale(1.4) rotate(-10deg); filter: brightness(2) drop-shadow(0 0 20px #fbbf24) drop-shadow(0 0 40px #ef4444); } 40% { transform: scale(0.9) rotate(5deg); filter: brightness(0.7); } 60% { transform: scale(1.2) rotate(-3deg); filter: brightness(1.5) drop-shadow(0 0 15px #fbbf24); } 100% { transform: scale(1) rotate(0deg); filter: brightness(1); } }
+        @keyframes screen-shake { 0%, 100% { transform: translate(0, 0); } 10% { transform: translate(-3px, -2px); } 20% { transform: translate(3px, 2px); } 30% { transform: translate(-2px, 3px); } 40% { transform: translate(2px, -3px); } 50% { transform: translate(-1px, 1px); } }
         
         @keyframes anim-epic-glow { 0%, 100% { filter: drop-shadow(0 0 5px #c084fc); transform: scale(1); } 50% { filter: drop-shadow(0 0 15px #a855f7); transform: scale(1.05); } }
         @keyframes anim-legendary-pulse { 0%, 100% { filter: drop-shadow(0 0 10px #fbbf24) hue-rotate(0deg); transform: scale(1) translateY(0); } 50% { filter: drop-shadow(0 0 25px #f59e0b) hue-rotate(15deg); transform: scale(1.1) translateY(-5px); } }
 
-        .anim-strike { animation: anim-strike 0.3s ease-out; z-index: 50; position: relative; }
-        .anim-shake { animation: anim-shake 0.3s ease-in-out; }
-        .anim-heal { animation: anim-heal 0.5s ease-out; }
+        .anim-strike { animation: anim-strike 0.5s ease-out; z-index: 50; position: relative; }
+        .anim-shake { animation: anim-shake 0.5s ease-in-out; }
+        .anim-heal { animation: anim-heal 0.8s ease-out; }
+        .anim-crit { animation: anim-crit 0.6s ease-out; }
+        .screen-shake { animation: screen-shake 0.4s ease-out; }
         .anim-epic { animation: anim-epic-glow 2s infinite ease-in-out; }
         .anim-legendary { animation: anim-legendary-pulse 1.5s infinite ease-in-out; }
 
-        .bag-theme { background: linear-gradient(180deg, #292524 0%, #1c1917 100%); border-color: #57534e; }
+        @keyframes next-battle-pulse { 0%, 100% { box-shadow: 0 0 10px #f59e0b, 0 0 20px #b45309; } 50% { box-shadow: 0 0 20px #fbbf24, 0 0 40px #f59e0b, 0 0 60px #b45309; } }
+        .btn-next-battle { animation: next-battle-pulse 1.5s infinite ease-in-out; }
         .bag-item { background: #44403c; border: 1px solid #78716c; }
         
         .equip-slot { width: 45px; height: 45px; background: #1f2937; border: 2px dashed #4b5563; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; cursor: pointer; transition: all 0.2s; position: relative; }
@@ -101,7 +108,7 @@
             <p class="text-gray-500 mb-8 text-sm">Your class defines your combat style</p>
             <div class="flex gap-4 w-full justify-center">
                 <button onclick="startGame('warrior')" class="flex-1 p-6 rounded-2xl border-2 border-red-800 hover:border-red-500 text-center transition-all active:scale-95 shadow-2xl hover:shadow-[0_0_20px_rgba(239,68,68,0.4)]" style="background: linear-gradient(145deg, #1c0a0a, #2d1010);">
-                    <div class="text-6xl mb-3" style="animation: float 3s infinite ease-in-out;">🗡️</div>
+                    <div class="text-6xl mb-3" style="animation: float 3s infinite ease-in-out;">🤺</div>
                     <div class="text-xl font-black text-red-400 mb-2">WARRIOR</div>
                     <div class="text-xs text-gray-400 leading-relaxed">High HP · Physical Damage<br>Bleeds & Armor Breaks</div>
                     <div class="mt-3 grid grid-cols-3 gap-1 text-[10px]">
@@ -111,7 +118,7 @@
                     </div>
                 </button>
                 <button onclick="startGame('mage')" class="flex-1 p-6 rounded-2xl border-2 border-blue-800 hover:border-blue-500 text-center transition-all active:scale-95 shadow-2xl hover:shadow-[0_0_20px_rgba(59,130,246,0.4)]" style="background: linear-gradient(145deg, #0a0a1c, #101028);">
-                    <div class="text-6xl mb-3" style="animation: float 3s infinite ease-in-out; animation-delay: 1s;">🧙</div>
+                    <div class="text-6xl mb-3" style="animation: float 3s infinite ease-in-out; animation-delay: 1s;">🧙‍♂️</div>
                     <div class="text-xl font-black text-blue-400 mb-2">MAGE</div>
                     <div class="text-xs text-gray-400 leading-relaxed">Low HP · Magical Damage<br>AoE Spells & Shields</div>
                     <div class="mt-3 grid grid-cols-3 gap-1 text-[10px]">
@@ -663,6 +670,9 @@
             </div>
             
             <div id="enemies-container" class="grid grid-cols-3 md:grid-cols-5 gap-2 mb-2 w-full justify-center mt-4"></div>
+            <div id="next-battle-container" class="w-full flex justify-center mb-2" style="display:none;">
+                <button onclick="endBattle(true)" class="btn-next-battle bg-yellow-600 hover:bg-yellow-500 text-black font-black px-6 py-2 rounded-full border-2 border-yellow-400 transition active:scale-95 text-sm">⏭️ Next Battle</button>
+            </div>
 
             <!-- ENEMY INFO PANEL -->
             <div id="target-info-panel" class="w-full bg-gray-800 bg-opacity-90 p-2 rounded-lg border border-gray-600 mb-2 flex justify-between items-center shadow-lg">
@@ -733,70 +743,263 @@
             if(!globalProgression.settings) globalProgression.settings = { sound: true, music: true };
             if(!globalProgression.settings.sound) return;
             if (!audioCtx || audioCtx.state !== 'running') return;
-            const now = audioCtx.currentTime; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            
-            if (type === 'hit') { osc.type = 'square'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(40, now + 0.1); gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1); osc.start(now); osc.stop(now + 0.1); } 
-            else if (type === 'heal') { osc.type = 'sine'; osc.frequency.setValueAtTime(300, now); osc.frequency.linearRampToValueAtTime(600, now + 0.3); gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0.001, now + 0.3); osc.start(now); osc.stop(now + 0.3); } 
-            else if (type === 'shield' || type === 'buff') { osc.type = 'triangle'; osc.frequency.setValueAtTime(200, now); gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0.001, now + 0.15); osc.start(now); osc.stop(now + 0.15); } 
-            else if (type === 'win') { osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.setValueAtTime(500, now + 0.1); osc.frequency.setValueAtTime(600, now + 0.2); gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0.001, now + 0.5); osc.start(now); osc.stop(now + 0.5); } 
-            else if (type === 'lose') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.linearRampToValueAtTime(50, now + 0.5); gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0.001, now + 0.5); osc.start(now); osc.stop(now + 0.5); } 
-            else if (type === 'click') { osc.type = 'sine'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(200, now + 0.05); gain.gain.setValueAtTime(0.01, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05); osc.start(now); osc.stop(now + 0.05); }
+            const now = audioCtx.currentTime;
+
+            if (type === 'hit') {
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(220, now); osc.frequency.exponentialRampToValueAtTime(55, now + 0.12);
+                gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                osc.start(now); osc.stop(now + 0.12);
+            } else if (type === 'crit') {
+                [220, 330, 440].forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(freq, now + i * 0.03); osc.frequency.exponentialRampToValueAtTime(freq * 0.5, now + 0.2);
+                    gain.gain.setValueAtTime(0.06, now + i * 0.03); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.start(now + i * 0.03); osc.stop(now + 0.25);
+                });
+            } else if (type === 'heal') {
+                [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.type = 'sine'; osc.frequency.setValueAtTime(freq, now + i * 0.07);
+                    gain.gain.setValueAtTime(0.0, now + i * 0.07); gain.gain.linearRampToValueAtTime(0.05, now + i * 0.07 + 0.05); gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.25);
+                    osc.start(now + i * 0.07); osc.stop(now + i * 0.07 + 0.25);
+                });
+            } else if (type === 'shield' || type === 'buff') {
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                const lfo = audioCtx.createOscillator(); const lfoGain = audioCtx.createGain();
+                lfo.type = 'sine'; lfo.frequency.value = 8; lfoGain.gain.value = 6;
+                lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(600, now); osc.frequency.linearRampToValueAtTime(800, now + 0.2);
+                gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0.001, now + 0.3);
+                osc.start(now); lfo.start(now); osc.stop(now + 0.3); lfo.stop(now + 0.3);
+            } else if (type === 'win') {
+                [[523.25, 0], [659.25, 0.1], [783.99, 0.2], [1046.5, 0.3], [1318.5, 0.4]].forEach(([freq, delay]) => {
+                    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.type = 'triangle'; osc.frequency.setValueAtTime(freq, now + delay);
+                    gain.gain.setValueAtTime(0.05, now + delay); gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.25);
+                    osc.start(now + delay); osc.stop(now + delay + 0.25);
+                });
+            } else if (type === 'lose') {
+                [[440, 0], [370, 0.15], [311, 0.3], [261, 0.45], [220, 0.6]].forEach(([freq, delay]) => {
+                    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(freq, now + delay); osc.frequency.linearRampToValueAtTime(freq * 0.7, now + delay + 0.2);
+                    gain.gain.setValueAtTime(0.04, now + delay); gain.gain.linearRampToValueAtTime(0.001, now + delay + 0.3);
+                    osc.start(now + delay); osc.stop(now + delay + 0.3);
+                });
+            } else if (type === 'click') {
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(1200, now); osc.frequency.exponentialRampToValueAtTime(600, now + 0.04);
+                gain.gain.setValueAtTime(0.015, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                osc.start(now); osc.stop(now + 0.04);
+            }
         }
 
-        // BOSS MUSIC THEMES
-        function playBossMusic() {
+        // BOSS & BATTLE MUSIC SYSTEM
+
+        // Boss Song 1: Dark ambient - deep bass drone with slow sine melody
+        function playBossSong1() {
+            if(!globalProgression.settings.music) return;
+            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
+            const now = audioCtx.currentTime;
+            // Bass drone
+            const bass = audioCtx.createOscillator(); const bassGain = audioCtx.createGain();
+            bass.type = 'sine'; bass.frequency.value = 65.41; // C2
+            bass.connect(bassGain); bassGain.connect(audioCtx.destination);
+            bassGain.gain.setValueAtTime(0, now); bassGain.gain.linearRampToValueAtTime(0.04, now + 3);
+            bass.start(now); activeOscillators.push({osc: bass, gain: bassGain});
+            // Slow melody
+            const mel = audioCtx.createOscillator(); const melGain = audioCtx.createGain();
+            mel.type = 'sine';
+            const melody = [[130.81,3],[155.56,3],[146.83,3],[130.81,3],[116.54,3],[123.47,3],[130.81,3],[110,3],[130.81,3],[155.56,3],[146.83,3],[130.81,3],[116.54,6],[130.81,3],[155.56,3],[185,3],[174.61,3],[155.56,3],[146.83,6]];
+            let t = now; melody.forEach(([f, d]) => { mel.frequency.setValueAtTime(f, t); t += d; });
+            mel.connect(melGain); melGain.connect(audioCtx.destination);
+            melGain.gain.setValueAtTime(0, now); melGain.gain.linearRampToValueAtTime(0.025, now + 4);
+            mel.start(now); activeOscillators.push({osc: mel, gain: melGain});
+        }
+
+        // Boss Song 2: Ethereal - triangle waves, minor pentatonic, slow
+        function playBossSong2() {
             if(!globalProgression.settings.music) return;
             stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            const lfo = audioCtx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 2; 
-            const lfoGain = audioCtx.createGain(); lfoGain.gain.value = 15;
-            lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
-            osc.frequency.setValueAtTime(65.41, now);
-            let time = now;
-            for(let i=0; i<30; i++) {
-                osc.frequency.setValueAtTime(65.41, time); osc.frequency.setValueAtTime(69.30, time + 0.5); osc.frequency.setValueAtTime(65.41, time + 1.0);
-                time += 1.5;
-            }
+            osc.type = 'triangle';
+            const penta = [[220,4],[261.63,4],[293.66,4],[349.23,4],[392,4],[349.23,4],[293.66,4],[261.63,4],[220,4],[196,4],[220,4],[261.63,4],[293.66,4],[349.23,4],[392,4],[440,4],[392,4],[349.23,4],[293.66,4],[220,8]];
+            let t = now; penta.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
             osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.03, now + 2);
+            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.035, now + 3);
+            osc.start(now); activeOscillators.push({osc, gain});
+        }
+
+        // Boss Song 3: Mysterious - detuned dual oscillators, whole tone scale
+        function playBossSong3() {
+            if(!globalProgression.settings.music) return;
+            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
+            const now = audioCtx.currentTime;
+            [0, 1.5].forEach(detune => {
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                osc.type = 'sine'; osc.detune.value = detune * 15;
+                const whole = [[261.63,4],[293.66,4],[329.63,4],[369.99,4],[415.3,4],[466.16,4],[415.3,4],[369.99,4],[329.63,4],[293.66,4],[261.63,4],[233.08,4],[261.63,4],[293.66,4],[369.99,4],[466.16,4],[369.99,4],[261.63,8]];
+                let t = now; whole.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.02, now + 3);
+                osc.start(now); activeOscillators.push({osc, gain});
+            });
+        }
+
+        // Boss Song 4: Intense chill - sawtooth filtered power chords
+        function playBossSong4() {
+            if(!globalProgression.settings.music) return;
+            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
+            const now = audioCtx.currentTime;
+            const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 600; filter.connect(audioCtx.destination);
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            const pat = [[110,3],[130.81,3],[98,3],[110,3],[87.31,3],[98,3],[110,6],[130.81,3],[146.83,3],[130.81,3],[110,3],[98,6],[110,3],[130.81,3],[155.56,3],[174.61,3],[155.56,3],[130.81,3],[110,6]];
+            let t = now; pat.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
+            osc.connect(gain); gain.connect(filter);
+            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.025, now + 2);
+            osc.start(now); activeOscillators.push({osc, gain});
+        }
+
+        // Boss Song 5: Haunting - sine with vibrato, Dorian mode
+        function playBossSong5() {
+            if(!globalProgression.settings.music) return;
+            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            const lfo = audioCtx.createOscillator(); const lfoGain = audioCtx.createGain();
+            lfo.type = 'sine'; lfo.frequency.value = 5; lfoGain.gain.value = 8;
+            lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
+            osc.type = 'sine';
+            // Dorian mode on D: D E F G A B C D
+            const dorian = [[146.83,4],[164.81,4],[174.61,4],[196,4],[220,4],[246.94,4],[261.63,4],[293.66,4],[261.63,4],[246.94,4],[220,4],[196,4],[174.61,4],[164.81,4],[146.83,4],[130.81,4],[146.83,4],[164.81,4],[196,4],[220,4],[246.94,4],[220,4],[196,4],[146.83,8]];
+            let t = now; dorian.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.03, now + 3);
             osc.start(now); lfo.start(now);
             activeOscillators.push({osc, lfo, gain});
         }
 
-        function playSongA() { playBossMusic(); } // Re-use boss music for A
-        function playSongB() {
+        // Battle Song 1: Rhythmic pulse - Aeolian alternating bass
+        function playBattleSong1() {
             if(!globalProgression.settings.music) return;
             stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = 'triangle'; osc.frequency.setValueAtTime(130.81, now); // C3
-            let time = now;
-            for(let i=0; i<30; i++) {
-                osc.frequency.setValueAtTime(130.81, time); osc.frequency.setValueAtTime(155.56, time+0.5); osc.frequency.setValueAtTime(196.00, time+1.0);
-                time += 1.5;
-            }
+            osc.type = 'triangle';
+            const aeolian = [[220,1.5],[196,1.5],[220,1.5],[261.63,1.5],[246.94,1.5],[220,1.5],[196,1.5],[174.61,1.5],[196,1.5],[220,1.5],[246.94,1.5],[261.63,1.5],[293.66,1.5],[261.63,1.5],[246.94,1.5],[220,3],[220,1.5],[196,1.5],[220,1.5],[246.94,1.5],[261.63,1.5],[293.66,1.5],[349.23,1.5],[329.63,1.5],[293.66,1.5],[261.63,1.5],[246.94,1.5],[220,3]];
+            let t = now; aeolian.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
             osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.04, now + 2);
+            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.04, now + 1.5);
             osc.start(now); activeOscillators.push({osc, gain});
         }
-        function playSongC() {
+
+        // Battle Song 2: Driving triangle, minor scale runs
+        function playBattleSong2() {
             if(!globalProgression.settings.music) return;
             stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = 'sine'; osc.frequency.setValueAtTime(261.63, now); // C4
-            let time = now;
-            for(let i=0; i<30; i++) {
-                osc.frequency.setValueAtTime(261.63, time); osc.frequency.setValueAtTime(329.63, time+1.0); osc.frequency.setValueAtTime(392.00, time+2.0);
-                time += 3.0;
-            }
+            osc.type = 'triangle';
+            const minor = [[261.63,1],[293.66,1],[311.13,1],[349.23,1],[392,1],[415.3,1],[392,1],[349.23,1],[311.13,1],[293.66,1],[261.63,1],[246.94,1],[261.63,1],[293.66,1],[349.23,1],[392,1],[440,1],[415.3,1],[392,1],[349.23,1],[311.13,1],[261.63,2],[293.66,1],[329.63,1],[349.23,1],[392,1],[440,1],[493.88,1],[440,1],[392,1],[349.23,1],[293.66,1],[261.63,2]];
+            let t = now; minor.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
             osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.03, now + 3);
+            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.04, now + 1.5);
             osc.start(now); activeOscillators.push({osc, gain});
         }
+
+        // Battle Song 3: Percussive staccato, pentatonic
+        function playBattleSong3() {
+            if(!globalProgression.settings.music) return;
+            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = 'square';
+            const penta = [[293.66,0.8],[0.1,0.2],[349.23,0.8],[0.1,0.2],[392,0.8],[0.1,0.2],[440,0.8],[0.1,0.2],[523.25,0.8],[0.1,0.2],[440,0.8],[0.1,0.2],[392,0.8],[0.1,0.2],[349.23,0.8],[0.1,0.2],[293.66,0.8],[0.1,0.4],[261.63,0.8],[0.1,0.2],[293.66,0.8],[0.1,0.2],[349.23,0.8],[0.1,0.2],[392,0.8],[0.1,0.2],[440,0.8],[0.1,0.2],[523.25,0.8],[0.1,0.2],[587.33,0.8],[0.1,0.2],[523.25,0.8],[0.1,0.4],[440,1.6]];
+            let t = now; penta.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.025, now + 1);
+            osc.start(now); activeOscillators.push({osc, gain});
+        }
+
+        // Battle Song 4: Flowing Phrygian melody
+        function playBattleSong4() {
+            if(!globalProgression.settings.music) return;
+            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            // Phrygian on E: E F G A B C D E
+            const phryg = [[329.63,1.2],[349.23,1.2],[392,1.2],[440,1.2],[493.88,1.2],[523.25,1.2],[587.33,1.2],[659.25,1.2],[587.33,1.2],[523.25,1.2],[493.88,1.2],[440,1.2],[392,1.2],[349.23,1.2],[329.63,2.4],[329.63,1.2],[392,1.2],[440,1.2],[493.88,1.2],[587.33,1.2],[659.25,1.2],[587.33,1.2],[493.88,1.2],[440,1.2],[392,1.2],[329.63,2.4]];
+            let t = now; phryg.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.04, now + 1.5);
+            osc.start(now); activeOscillators.push({osc, gain});
+        }
+
+        // Battle Song 5: Energetic arpeggios, harmonic minor
+        function playBattleSong5() {
+            if(!globalProgression.settings.music) return;
+            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            // Harmonic minor arpeggios on A
+            const hMin = [[220,0.6],[261.63,0.6],[329.63,0.6],[415.3,0.6],[329.63,0.6],[261.63,0.6],[220,0.6],[196,0.6],[220,0.6],[261.63,0.6],[329.63,0.6],[440,0.6],[329.63,0.6],[261.63,0.6],[220,1.2],[246.94,0.6],[293.66,0.6],[369.99,0.6],[493.88,0.6],[369.99,0.6],[293.66,0.6],[246.94,0.6],[220,0.6],[246.94,0.6],[293.66,0.6],[369.99,0.6],[440,0.6],[369.99,0.6],[293.66,0.6],[220,1.2]];
+            let t = now; hMin.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.04, now + 1);
+            osc.start(now); activeOscillators.push({osc, gain});
+        }
+
+        // Menu Music: Very chill ambient pad, major pentatonic, very slow & low volume
+        function playMenuMusic() {
+            if(!globalProgression.settings || !globalProgression.settings.music) return;
+            stopMusic(); if (!audioCtx || audioCtx.state !== 'running') return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            const lfo = audioCtx.createOscillator(); const lfoGain = audioCtx.createGain();
+            lfo.type = 'sine'; lfo.frequency.value = 0.3; lfoGain.gain.value = 3;
+            lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
+            osc.type = 'sine';
+            // Major pentatonic, very slow (5-7s per note)
+            const pentatonicMenu = [[261.63,6],[293.66,5],[329.63,6],[392,7],[440,5],[392,6],[329.63,7],[293.66,5],[261.63,6],[220,7],[261.63,5],[293.66,6],[329.63,7],[392,5],[440,6],[493.88,7],[440,5],[392,6],[329.63,7],[261.63,8]];
+            let t = now; pentatonicMenu.forEach(([f,d]) => { osc.frequency.setValueAtTime(f, t); t += d; });
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.018, now + 4);
+            osc.start(now); lfo.start(now);
+            activeOscillators.push({osc, lfo, gain});
+        }
+
+        function playBossMusic() {
+            const pick = Math.floor(Math.random() * 5) + 1;
+            if(pick === 1) playBossSong1();
+            else if(pick === 2) playBossSong2();
+            else if(pick === 3) playBossSong3();
+            else if(pick === 4) playBossSong4();
+            else playBossSong5();
+        }
+
+        function playBattleMusic() {
+            const pick = Math.floor(Math.random() * 5) + 1;
+            if(pick === 1) playBattleSong1();
+            else if(pick === 2) playBattleSong2();
+            else if(pick === 3) playBattleSong3();
+            else if(pick === 4) playBattleSong4();
+            else playBattleSong5();
+        }
+
+        function playSongA() { playBossMusic(); }
+        function playSongB() { playBattleMusic(); }
+        function playSongC() { playBattleMusic(); }
 
         function stopMusic() {
             activeOscillators.forEach(o => {
@@ -843,7 +1046,7 @@
         // CLASSES & SKILLS
         const CLASSES = {
             warrior: { 
-                name: 'Warrior', icon: '⚔️', avatar: '🗡️', baseHp: 50, baseDmg: 5,
+                name: 'Warrior', icon: '⚔️', avatar: '🤺', baseHp: 50, baseDmg: 5,
                 skills: [
                     { name: 'Slash', type: 'attack', mult: 1, cd: 0, color: 'bg-gray-700', desc: 'Base damage' },
                     { name: 'Cleave', type: 'attack', mult: 1, effect: { bleed: true, turns: 5 }, cd: 5, color: 'bg-red-700', desc: 'Dmg + 1% Max HP Bleed (5t)' },
@@ -858,7 +1061,7 @@
                 ]
             },
             mage: {
-                name: 'Mage', icon: '🪄', avatar: '🧙', baseHp: 40, baseDmg: 8,
+                name: 'Mage', icon: '🪄', avatar: '🧙‍♂️', baseHp: 40, baseDmg: 8,
                 skills: [
                     { name: 'Blast', type: 'attack', mult: 1, cd: 0, color: 'bg-blue-700', desc: 'Base damage' },
                     { name: 'Fireball', type: 'attack', mult: 1.02, cd: 4, color: 'bg-red-600', desc: 'Base dmg + 2%' },
@@ -1137,7 +1340,7 @@
             if (targetScreen) targetScreen.classList.add('active-screen');
         }
 
-        function showMenu() { switchScreen('screen-menu'); }
+        function showMenu() { stopMusic(); switchScreen('screen-menu'); setTimeout(playMenuMusic, 1100); /* 1100ms: allows stopMusic() 1s fade-out to complete */ }
         function showClassSelect() { switchScreen('screen-class-select'); }
         
         function changeClass() {
@@ -1244,6 +1447,16 @@
                     seenNames.add(e.name);
                     uniqueEnemies.push(e);
                 }
+            });
+
+            uniqueEnemies.sort((a, b) => {
+                let aDiscovered = globalProgression.discoveredEnemies && globalProgression.discoveredEnemies[a.name];
+                let bDiscovered = globalProgression.discoveredEnemies && globalProgression.discoveredEnemies[b.name];
+                let aClaimed = globalProgression.claimedCodexRewards && globalProgression.claimedCodexRewards[a.name];
+                let bClaimed = globalProgression.claimedCodexRewards && globalProgression.claimedCodexRewards[b.name];
+                let aPriority = !aDiscovered ? 3 : (!aClaimed ? 1 : 2);
+                let bPriority = !bDiscovered ? 3 : (!bClaimed ? 1 : 2);
+                return aPriority - bPriority;
             });
 
             uniqueEnemies.forEach(e => {
@@ -2594,8 +2807,9 @@
             activeTargetIndex = 0;
 
             if(isBossFight) {
-                let bRoll = Math.random();
-                if(bRoll < 0.33) playSongA(); else if(bRoll < 0.66) playSongB(); else playSongC();
+                playBossMusic();
+            } else {
+                playBattleMusic();
             }
         }
 
@@ -2777,9 +2991,12 @@
                     if(e.dodgeTurns > 0) eStatus += `💨`;
                     if(e.stunned > 0) eStatus += `😵`;
 
-                    card.innerHTML = `<div class="relative w-full text-center"><div class="absolute -top-1 -right-2 text-sm flex gap-1">${eStatus}</div><div class="text-3xl mb-1 mt-2 ${animClass}">${e.avatar}</div></div><div class="text-[10px] font-bold truncate w-full text-center ${rarityColor}">Lv.${e.lvl} ${e.name}</div><div class="health-bar-container !h-1.5 !mt-1"><div class="health-bar" style="width: ${(Math.max(0, e.currentHp) / e.maxHp) * 100}%"></div></div>`;
+                    card.innerHTML = `<div class="relative w-full text-center"><div class="absolute -top-1 -right-2 text-sm flex gap-1">${eStatus}</div><div class="text-3xl mb-1 mt-2 ${animClass}">${e.avatar}</div></div><div class="text-[10px] font-bold truncate w-full text-center ${rarityColor}">Lv.${e.lvl} ${e.name}</div><div class="health-bar-container !h-1.5 !mt-1"><div class="health-bar" style="width: ${(Math.max(0, e.currentHp) / e.maxHp) * 100}%"></div></div>${isDead ? '<div class="enemy-death-overlay">💀</div>' : ''}`;
                     eContainer.appendChild(card);
                 });
+                // Show Next Battle button when all enemies are dead and combat still active
+                const nextBattleBtn = document.getElementById('next-battle-container');
+                if(nextBattleBtn) nextBattleBtn.style.display = (combatActive && enemies.length > 0 && enemies.every(e => e.currentHp <= 0)) ? 'flex' : 'none';
             }
 
             // Update Target Info Panel
@@ -2837,7 +3054,8 @@
         }
 
         function processAutoTurn() {
-            if(!isPlayerTurn || !combatActive || enemies.every(e => e.currentHp <= 0)) return;
+            if(!isPlayerTurn || !combatActive) return;
+            if(enemies.every(e => e.currentHp <= 0)) { if(combatActive) endBattle(true); return; }
             let hpPct = player.currentHp / player.maxHp; let inv = globalProgression.inventory;
             
             let healMult = player.activeBuffs.some(b => b.type === 'poison') ? 0.5 : 1.0;
@@ -3184,7 +3402,9 @@
         }
 
         function startPlayerTurn() {
-            if(!combatActive || player.currentHp <= 0) return; 
+            if(!combatActive || player.currentHp <= 0) return;
+            // Safety watchdog: if all enemies are dead, end battle
+            if(enemies.length > 0 && enemies.every(e => e.currentHp <= 0)) { endBattle(true); return; }
             
             if(player.bleedTurns > 0) {
                 let bDmg = Math.max(1, Math.floor(player.maxHp * 0.01 * player.bleedStacks));
