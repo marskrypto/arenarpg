@@ -1147,12 +1147,13 @@
             lastHpRegenTime: Date.now(), enemyKillCounts: {}, claimedCodexMilestones: {},
             totalExpEarned: 0, cooldowns: { herbs: 0, mine: 0, fish: 0 },
             inventory: { ench_common: 0, ench_rare: 0, ench_epic: 0, ench_legendary: 0, herb_red: 0, herb_blue: 0, fish_1: 0, fish_2: 0, fish_3: 0, fish_4: 0, fish_5: 0, fish_6: 0, soul_pebbles: 0, pot_i1: 20, pot_i2: 0, pot_i3: 0, pot_r1: 0, pot_r2: 0, pot_r3: 0, food_d1: 0, food_d2: 0, food_d3: 0, food_df1: 0, food_df2: 0, food_df3: 0 },
-            equipInventory: [], equipped: { head: null, shoulders: null, chest: null, arms: null, waist: null, legs: null, boots: null, necklace: null, ring1: null, ring2: null, ring3: null, ring4: null, weapon: null },
+            equipInventory: [], equipped: { head: null, shoulders: null, chest: null, arms: null, waist: null, legs: null, boots: null, necklace: null, ring1: null, ring2: null, ring3: null, ring4: null, weapon: null, cape: null },
             newItems: {}, shopGear: [], shopLastRefresh: 0,
             attributes: { hp: 1, tenacity: 1, agility: 1, willpower: 1, resistance: 1, reflexes: 1, fury: 1, devastation: 0 },
             storyModeProgress: { hunting: 0, pillage: 0, workshop: 0 },
             settings: { sound: true, music: true },
-            discoveredEnemies: {}, claimedCodexRewards: {}, killedBosses: {}
+            discoveredEnemies: {}, claimedCodexRewards: {}, killedBosses: {},
+            skillTreeEnhancements: []
         };
 
         // Skill Tree Pre-Generation
@@ -1176,7 +1177,8 @@
             treeProgressFire: 0, treeProgressIce: 0, treeProgressOffense: 0, treeProgressDefense: 0,
             skillPoints: 0, unlockedSkills: [0, 1, 2], equippedSkills: [0, 1, 2, null, null], 
             skillCooldowns: {}, regenBuffs: [], activeBuffs: [],
-            stunned: 0, bleedStacks: 0, bleedTurns: 0, dodgeTurns: 0
+            stunned: 0, bleedStacks: 0, bleedTurns: 0, dodgeTurns: 0,
+            equippedUsables: [null, null, null, null, null, null, null, null]
         };
 
         let enemies = []; let activeTargetIndex = 0; let currentMode = 'none'; 
@@ -1366,7 +1368,7 @@
         function getPlayerDef() {
             let equipStats = getEquipStats();
             let a = globalProgression.attributes;
-            return 1 + player.treeBonusDef + equipStats.def; // HP no longer adds defense
+            return 1 + (player.treeBonusDef || 0); // HP no longer adds defense; gear def replaced by damageReduction %
         }
 
         function switchScreen(screenId) {
@@ -1621,7 +1623,7 @@
             document.getElementById('char-stat-gs').innerText = totalGs.toFixed(0);
 
             document.getElementById('char-stat-dodge').innerText = `${((a.resistance * 0.1) + (eqStats.dodge * 100)).toFixed(1)}%`;
-            document.getElementById('char-stat-hit').innerText = `${((a.reflexes * 0.1) + (eqStats.hit * 100)).toFixed(1)}%`;
+            document.getElementById('char-stat-hit').innerText = `${(95 + (a.reflexes * 0.1) + (eqStats.hit * 100)).toFixed(1)}%`;
             document.getElementById('char-stat-crit').innerText = `${Math.min(75, (a.reflexes * 1) + (eqStats.critRate * 100)).toFixed(1)}%`;
             document.getElementById('char-stat-critdmg').innerText = `${((a.fury * 1) + (a.willpower * 0.5) + (eqStats.critDamage * 100)).toFixed(1)}%`;
             document.getElementById('char-stat-dmgred').innerText = `${((a.tenacity * 0.1) + (eqStats.damageReduction * 100)).toFixed(1)}%`;
