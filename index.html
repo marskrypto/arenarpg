@@ -879,7 +879,7 @@
         const ENEMIES_HUNT = [
             { name: 'Boar', avatar: '🐗', hpMult: 1.2, dmgMult: 0.8 }, { name: 'Wolf', avatar: '🐺', hpMult: 0.8, dmgMult: 1.2 }, { name: 'Bear', avatar: '🐻', hpMult: 1.5, dmgMult: 1.0 }, { name: 'Spider', avatar: '🕷️', hpMult: 0.7, dmgMult: 1.5 }, { name: 'Snake', avatar: '🐍', hpMult: 0.6, dmgMult: 1.8 }, { name: 'Treant', avatar: '🌲', hpMult: 1.8, dmgMult: 0.7 }, { name: 'Dire Bat', avatar: '🦇', hpMult: 0.6, dmgMult: 1.4 }, { name: 'Giant Toad', avatar: '🐸', hpMult: 1.3, dmgMult: 0.9 },
             { name: 'Dire Wolf', avatar: '🐺', hpMult: 1.0, dmgMult: 1.5 }, { name: 'Shadow Lynx', avatar: '🐱', hpMult: 0.7, dmgMult: 1.7 }, { name: 'Venomous Scorpion', avatar: '🦂', hpMult: 0.8, dmgMult: 1.6 }, { name: 'Thunder Elk', avatar: '🦌', hpMult: 1.6, dmgMult: 1.1 }, { name: 'Crystal Fox', avatar: '🦊', hpMult: 0.9, dmgMult: 1.3 }, { name: 'Sabertooth', avatar: '🐯', hpMult: 1.2, dmgMult: 1.4 }, { name: 'Giant Hawk', avatar: '🦅', hpMult: 0.6, dmgMult: 1.9 }, { name: 'Cave Troll', avatar: '👹', hpMult: 2.0, dmgMult: 0.8 },
-            { name: 'Plague Rat', avatar: '🐀', hpMult: 0.5, dmgMult: 2.0 }, { name: 'Rock Lizard', avatar: '🦎', hpMult: 1.4, dmgMult: 0.9 }, { name: 'Poison Frog', avatar: '🐸', hpMult: 0.7, dmgMult: 1.6 }, { name: 'Storm Eagle', avatar: '🦅', hpMult: 0.8, dmgMult: 1.8 }, { name: 'Frost Rabbit', avatar: '🐰', hpMult: 0.6, dmgMult: 1.3 }, { name: 'Vine Creeper', avatar: '🌿', hpMult: 1.7, dmgMult: 0.6 }, { name: 'Mud Crab', avatar: '🦀', hpMult: 1.5, dmgMult: 0.7 }, { name: 'Wild Boar King', avatar: '🐗', hpMult: 2.2, dmgMult: 1.2 }, { name: 'Blood Hawk', avatar: '🦆', hpMult: 0.6, dmgMult: 2.1 }
+            { name: 'Plague Rat', avatar: '🐀', hpMult: 0.5, dmgMult: 2.0 }, { name: 'Rock Lizard', avatar: '🦎', hpMult: 1.4, dmgMult: 0.9 }, { name: 'Poison Frog', avatar: '🐸', hpMult: 0.7, dmgMult: 1.6 }, { name: 'Storm Eagle', avatar: '🦅', hpMult: 0.8, dmgMult: 1.8 }, { name: 'Frost Rabbit', avatar: '🐰', hpMult: 0.6, dmgMult: 1.3 }, { name: 'Vine Creeper', avatar: '🌿', hpMult: 1.7, dmgMult: 0.6 }, { name: 'Mud Crab', avatar: '🦀', hpMult: 1.5, dmgMult: 0.7 }, { name: 'Wild Boar King', avatar: '🐗', hpMult: 2.2, dmgMult: 1.2 }, { name: 'Blood Hawk', avatar: '🦅', hpMult: 0.6, dmgMult: 2.1 }
         ];
         const ENEMIES_PILLAGE = [
             { name: 'Peasant', avatar: '🧑‍🌾', hpMult: 0.8, dmgMult: 0.5 }, { name: 'Militia', avatar: '💂', hpMult: 1.0, dmgMult: 1.0 }, { name: 'Guard', avatar: '🛡️', hpMult: 1.5, dmgMult: 0.8 }, { name: 'Knight', avatar: '🤺', hpMult: 1.2, dmgMult: 1.2 }, { name: 'Bandit', avatar: '🦹', hpMult: 0.9, dmgMult: 1.1 }, { name: 'Rogue', avatar: '🗡️', hpMult: 0.7, dmgMult: 1.6 }, { name: 'Cultist', avatar: '🥷', hpMult: 0.8, dmgMult: 1.4 }, { name: 'Marauder', avatar: '🪓', hpMult: 1.4, dmgMult: 1.2 },
@@ -3248,8 +3248,8 @@
                     let baseName = e.name.replace(/^(Rare |Epic |Legendary )/, '');
                     if(!globalProgression.enemyKillCounts) globalProgression.enemyKillCounts = {};
                     globalProgression.enemyKillCounts[baseName] = (globalProgression.enemyKillCounts[baseName] || 0) + 1;
-                    if((globalProgression.enemyKillCounts[baseName] % 100 === 0) && !((globalProgression.claimedCodexMilestones || {})[baseName + '_' + globalProgression.enemyKillCounts[baseName]])) {
-                        let milestoneKey = baseName + '_' + globalProgression.enemyKillCounts[baseName];
+                    let milestoneKey = baseName + '_' + globalProgression.enemyKillCounts[baseName];
+                    if((globalProgression.enemyKillCounts[baseName] % 100 === 0) && !((globalProgression.claimedCodexMilestones || {})[milestoneKey])) {
                         if(!globalProgression.claimedCodexMilestones) globalProgression.claimedCodexMilestones = {};
                         globalProgression.claimedCodexMilestones[milestoneKey] = true;
                         globalProgression.gold += 1000;
