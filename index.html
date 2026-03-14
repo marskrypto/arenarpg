@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fog Fighter</title>
+    <title>Eternal Ascension - Way of the Hero</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { margin: 0; padding: 0; overflow: hidden; background-color: #111; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; touch-action: none; }
@@ -96,7 +96,8 @@
         <span class="particle" style="left:70%; animation-delay:1s; animation-duration:8s;">💀</span>
         <span class="particle" style="left:85%; animation-delay:3s; animation-duration:10s;">🗡️</span>
         <div class="flex flex-col items-center z-10 px-6 w-full max-w-lg">
-            <h1 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-red-600 mb-2 text-center" style="animation: title-glow 2s infinite; -webkit-text-stroke: 1px rgba(239,68,68,0.3);">ARENA RPG</h1>
+            <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-red-600 mb-1 text-center" style="animation: title-glow 2s infinite; -webkit-text-stroke: 1px rgba(239,68,68,0.3);">Eternal Ascension</h1>
+            <p class="text-2xl font-bold text-orange-300 text-center mb-2" style="animation: title-glow 2s infinite;">Way of the Hero</p>
             <p class="text-gray-400 tracking-widest uppercase text-sm mb-12">Choose Your Destiny</p>
             <button onclick="showClassSelect()" class="w-full mb-4 py-5 rounded-2xl font-black text-xl shadow-[0_0_30px_rgba(239,68,68,0.5)] transition active:scale-95 border-2 border-red-500 hover:border-red-400" style="background: linear-gradient(135deg, #7f1d1d, #991b1b, #7f1d1d);">
                 ⚔️ Start New Game
@@ -175,7 +176,7 @@
 
             <!-- Town Title -->
             <div class="w-full text-center mb-4">
-                <h2 class="text-2xl font-black text-yellow-300 tracking-widest drop-shadow-lg">⛺ Town</h2>
+                <h2 class="text-2xl font-black text-yellow-300 tracking-widest drop-shadow-lg">⛺ Goldcrest Town</h2>
             </div>
             
             <!-- Adventure Hunt Button -->
@@ -427,6 +428,7 @@
                     <div class="equip-slot" id="slot-ring2" onclick="openEquipModal('ring2')" title="Ring 2">💍</div>
                     <div class="equip-slot" id="slot-ring3" onclick="openEquipModal('ring3')" title="Ring 3">💍</div>
                     <div class="equip-slot" id="slot-ring4" onclick="openEquipModal('ring4')" title="Ring 4">💍</div>
+                    <div class="equip-slot" id="slot-cape" onclick="openEquipModal('cape')" title="Cape">🧥</div>
                 </div>
             </div>
 
@@ -438,8 +440,8 @@
                 <div class="text-gray-400 pl-3 border-l border-gray-600">HP Regen: <span class="text-green-300 font-bold float-right" id="char-stat-regen">0</span></div>
                 <div class="text-gray-400">Dodge Chance: <span class="text-purple-400 font-bold float-right" id="char-stat-dodge">0%</span></div>
                 <div class="text-gray-400 pl-3 border-l border-gray-600">Hit Chance: <span class="text-green-400 font-bold float-right" id="char-stat-hit">0%</span></div>
-                <div class="text-gray-400">Crit Chance: <span class="text-yellow-400 font-bold float-right" id="char-stat-crit">5%</span></div>
-                <div class="text-gray-400 pl-3 border-l border-gray-600">Crit Damage: <span class="text-red-400 font-bold float-right" id="char-stat-critdmg">150%</span></div>
+                <div class="text-gray-400">Crit Chance: <span class="text-yellow-400 font-bold float-right" id="char-stat-crit">0%</span></div>
+                <div class="text-gray-400 pl-3 border-l border-gray-600">Crit Damage: <span class="text-red-400 font-bold float-right" id="char-stat-critdmg">100%</span></div>
                 <div class="text-gray-400">Dmg Reduction: <span class="text-orange-400 font-bold float-right" id="char-stat-dmgred">0%</span></div>
                 <div class="text-gray-400 pl-3 border-l border-gray-600">Dmg Reflect: <span class="text-orange-300 font-bold float-right" id="char-stat-reflect">0%</span></div>
                 <div class="text-gray-400">Skill Dmg: <span class="text-yellow-300 font-bold float-right" id="char-stat-skilldmg">0%</span></div>
@@ -610,12 +612,12 @@
                     <div class="text-[11px] text-gray-300">Can be used once per day.</div>
                 </button>
                 <button id="well-xp-btn" onclick="buyWellXpBuff()" class="bg-yellow-800 hover:bg-yellow-700 border border-yellow-500 p-4 rounded-xl text-left disabled:opacity-50">
-                    <div class="font-bold text-yellow-200">⚡ 2x XP Blessing — 20 Gold</div>
-                    <div class="text-[11px] text-gray-300">Applies to your next 10 completed battles.</div>
+                    <div class="font-bold text-yellow-200">⚡ 5x XP Blessing — 20 Gold</div>
+                    <div class="text-[11px] text-gray-300">Applies to your next 10 completed battles. Once per day.</div>
                 </button>
                 <button id="well-drop-btn" onclick="buyWellDropBuff()" class="bg-purple-800 hover:bg-purple-700 border border-purple-500 p-4 rounded-xl text-left disabled:opacity-50">
-                    <div class="font-bold text-purple-200">🎁 2x Drop Rate Blessing — 20 Gold</div>
-                    <div class="text-[11px] text-gray-300">Doubles drop chance rolls for your next 10 completed battles.</div>
+                    <div class="font-bold text-purple-200">🎁 5x Drop Rate Blessing — 20 Gold</div>
+                    <div class="text-[11px] text-gray-300">5x drop chance rolls for your next 10 completed battles. Once per day.</div>
                 </button>
             </div>
             <div id="well-log" class="text-center text-cyan-300 font-bold mt-4 min-h-6"></div>
@@ -793,7 +795,7 @@
         </div>
         <div class="flex flex-col gap-3 w-full max-w-xs">
             <button id="btn-end-next" onclick="handleEndNext()" class="w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-xl text-xl font-bold transition active:scale-95 shadow-[0_0_15px_rgba(37,99,235,0.5)] hidden border border-blue-400">Continue</button>
-            <button id="btn-end-hub" onclick="showHub()" class="w-full py-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-xl font-bold transition shadow-lg border border-gray-600 active:scale-95">Return to Town</button>
+            <button id="btn-end-hub" onclick="showHub()" class="w-full py-4 bg-gray-800 hover:bg-gray-700 rounded-xl text-xl font-bold transition shadow-lg border border-gray-600 active:scale-95">Return to Goldcrest Town</button>
         </div>
     </div>
 
@@ -954,7 +956,7 @@
             if(!MAT_NAMES[c.id]) MAT_NAMES[c.id] = c.name;
         });
 
-        const EQUIP_SLOTS = ['head', 'shoulders', 'chest', 'arms', 'waist', 'legs', 'boots', 'necklace', 'ring1', 'ring2', 'ring3', 'ring4', 'weapon'];
+        const EQUIP_SLOTS = ['head', 'shoulders', 'chest', 'arms', 'waist', 'legs', 'boots', 'necklace', 'ring1', 'ring2', 'ring3', 'ring4', 'weapon', 'cape'];
         const RARITIES = ['common', 'rare', 'epic', 'legendary'];
         const RARITY_MULTS = { common: 1, rare: 2, epic: 5, legendary: 10 };
 
@@ -1057,7 +1059,7 @@
             lastHpRegenTime: Date.now(), enemyKillCounts: {}, claimedCodexMilestones: {},
             totalExpEarned: 0, cooldowns: { herbs: 0, mine: 0, fish: 0 },
             inventory: { ench_common: 0, ench_rare: 0, ench_epic: 0, ench_legendary: 0, herb_red: 0, herb_blue: 0, fish_1: 0, fish_2: 0, fish_3: 0, fish_4: 0, fish_5: 0, fish_6: 0, soul_pebbles: 0, pot_i1: 20, pot_i2: 0, pot_i3: 0, pot_r1: 0, pot_r2: 0, pot_r3: 0, food_d1: 0, food_d2: 0, food_d3: 0, food_df1: 0, food_df2: 0, food_df3: 0 },
-            equipInventory: [], equipped: { head: null, shoulders: null, chest: null, arms: null, waist: null, legs: null, boots: null, necklace: null, ring1: null, ring2: null, ring3: null, ring4: null, weapon: null },
+            equipInventory: [], equipped: { head: null, shoulders: null, chest: null, arms: null, waist: null, legs: null, boots: null, necklace: null, ring1: null, ring2: null, ring3: null, ring4: null, weapon: null, cape: null },
             newItems: {}, shopGear: [], shopLastRefresh: 0,
             attributes: { hp: 1, tenacity: 1, agility: 1, willpower: 1, resistance: 1, reflexes: 1, fury: 1, devastation: 0 },
             storyModeProgress: { hunting: 0, pillage: 0, workshop: 0 },
@@ -1177,6 +1179,8 @@
                 if(!player.equippedUsables) player.equippedUsables = [null, null, null, null, null, null, null, null];
                 if(globalProgression.skillTreeEnhancements === undefined) globalProgression.skillTreeEnhancements = [];
                 if(player.wayOfHeavensCooldown === undefined) player.wayOfHeavensCooldown = 0;
+                if(globalProgression.equipped && globalProgression.equipped.cape === undefined) globalProgression.equipped.cape = null;
+                if(globalProgression.classBaseAttributes === undefined) globalProgression.classBaseAttributes = null;
 
                 if (globalProgression.lastQuestDate !== new Date().toDateString()) {
                     globalProgression.questsCompletedToday = 0;
@@ -1198,7 +1202,7 @@
         }
 
         function getDropRateMultiplier() {
-            return (globalProgression.wellDropBattles || 0) > 0 ? 2 : 1;
+            return (globalProgression.wellDropBattles || 0) > 0 ? 5 : 1;
         }
 
         function rollWithDropRate(baseChance) {
@@ -1236,7 +1240,7 @@
         function calculateMaxHp() {
             let equipStats = getEquipStats();
             let a = globalProgression.attributes;
-            let base = player.data.baseHp + ((player.lvl - 1) * 15) + (a.hp * 12) + (a.tenacity * 2) + (a.agility * 2) + (a.resistance * 2) + player.treeBonusHp + equipStats.hp;
+            let base = player.data.baseHp + ((player.lvl - 1) * 15) + (a.hp * 12) + (a.tenacity * 2) + (a.agility * 2) + (a.resistance * 2) + player.treeBonusHp + equipStats.hp + getEquipBonusStat('bonusHp');
             // Apply HP Boost enhancements
             let hpBoostMult = 1;
             (globalProgression.skillTreeEnhancements || []).forEach(enh => {
@@ -1250,13 +1254,37 @@
         function getBaseDamage() {
             let equipStats = getEquipStats();
             let a = globalProgression.attributes;
-            return player.data.baseDmg + (a.willpower * 2) + (a.agility * 1) + (a.reflexes * 1) + player.treeBonusDmg + equipStats.dmg;
+            return player.data.baseDmg + (a.willpower * 2) + (a.agility * 1) + (a.reflexes * 1) + player.treeBonusDmg + equipStats.dmg + getEquipBonusStat('bonusAtk');
         }
         
         function getPlayerDef() {
             let equipStats = getEquipStats();
             let a = globalProgression.attributes;
             return 1 + player.treeBonusDef + equipStats.def; // HP no longer adds defense
+        }
+
+        // Returns the permanent base attributes for each class (cannot go below these)
+        function getClassBaseAttributes(classId) {
+            if (classId === 'warrior') {
+                return { hp: 10, tenacity: 1, agility: 1, willpower: 1, resistance: 1, reflexes: 1, fury: 1, devastation: 0 };
+            } else if (classId === 'mage') {
+                return { hp: 1, tenacity: 1, agility: 1, willpower: 1, resistance: 1, reflexes: 10, fury: 1, devastation: 0 };
+            }
+            return { hp: 1, tenacity: 1, agility: 1, willpower: 1, resistance: 1, reflexes: 1, fury: 1, devastation: 0 };
+        }
+
+        // Returns the per-class attribute caps
+        function getClassAttrCap(classId, attrId) {
+            if (classId === 'warrior') {
+                if (attrId === 'willpower') return 25;
+                if (attrId === 'hp') return 9999;
+            } else if (classId === 'mage') {
+                if (attrId === 'hp') return 50;
+                if (attrId === 'willpower') return 50;
+            }
+            if (attrId === 'willpower') return 50;
+            if (attrId === 'devastation') return 100;
+            return 9999;
         }
 
         function switchScreen(screenId) {
@@ -1337,8 +1365,8 @@
                 lastHpRegenTime: Date.now(), enemyKillCounts: {}, claimedCodexMilestones: {},
                 totalExpEarned: 0, cooldowns: { herbs: 0, mine: 0, fish: 0 },
                 inventory: { ench_common: 0, ench_rare: 0, ench_epic: 0, ench_legendary: 0, herb_red: 0, herb_blue: 0, fish_1: 0, fish_2: 0, fish_3: 0, fish_4: 0, fish_5: 0, fish_6: 0, soul_pebbles: 0, pot_i1: 20, pot_i2: 0, pot_i3: 0, pot_r1: 0, pot_r2: 0, pot_r3: 0, food_d1: 0, food_d2: 0, food_d3: 0, food_df1: 0, food_df2: 0, food_df3: 0 },
-                equipInventory: [], equipped: { head: null, shoulders: null, chest: null, arms: null, waist: null, legs: null, boots: null, necklace: null, ring1: null, ring2: null, ring3: null, ring4: null, weapon: null }, newItems: {},
-                shopGear: [], shopLastRefresh: 0, attributes: { hp: 1, tenacity: 1, agility: 1, willpower: 1, resistance: 1, reflexes: 1, fury: 1, devastation: 0 },
+                equipInventory: [], equipped: { head: null, shoulders: null, chest: null, arms: null, waist: null, legs: null, boots: null, necklace: null, ring1: null, ring2: null, ring3: null, ring4: null, weapon: null, cape: null }, newItems: {},
+                shopGear: [], shopLastRefresh: 0, attributes: getClassBaseAttributes(classId),
                 storyModeProgress: { hunting: 0, pillage: 0, workshop: 0 },
                 settings: { sound: true, music: true },
                 discoveredEnemies: {}, claimedCodexRewards: {}, killedBosses: {},
@@ -1557,16 +1585,16 @@
             document.getElementById('char-stat-def').innerText = `${getPlayerDef()} (+${eqStats.def})`;
             
             let a = globalProgression.attributes;
-            let hpRegenAmt = Math.floor(player.maxHp * (a.hp * 0.0001));
+            let hpRegenAmt = Math.floor(player.maxHp * (a.hp * 0.0001 + getEquipBonusStat('bonusHpRegen')));
             document.getElementById('char-stat-regen').innerText = `${(player.treeBonusRegen || 0) + hpRegenAmt} HP/Turn`;
             document.getElementById('char-stat-gs').innerText = (eqStats.hp/10 + eqStats.dmg*2 + eqStats.def*5).toFixed(0);
 
-            document.getElementById('char-stat-dodge').innerText = `${(a.resistance * 0.1).toFixed(1)}%`;
-            document.getElementById('char-stat-hit').innerText = `${(a.reflexes * 0.1).toFixed(1)}%`;
-            document.getElementById('char-stat-crit').innerText = `${Math.min(75, 5 + (a.reflexes * 1)).toFixed(0)}%`;
-            document.getElementById('char-stat-critdmg').innerText = `${(150 + (a.fury * 1) + (a.willpower * 0.5)).toFixed(0)}%`;
-            document.getElementById('char-stat-dmgred').innerText = `${(a.tenacity * 0.1).toFixed(1)}%`;
-            document.getElementById('char-stat-reflect').innerText = `${(a.tenacity * 0.01).toFixed(2)}%`;
+            document.getElementById('char-stat-dodge').innerText = `${((a.resistance * 0.001 + getEquipBonusStat('bonusDodge')) * 100).toFixed(1)}%`;
+            document.getElementById('char-stat-hit').innerText = `${((a.reflexes * 0.001 + getEquipBonusStat('bonusHit')) * 100).toFixed(1)}%`;
+            document.getElementById('char-stat-crit').innerText = `${Math.min(75, (a.reflexes * 1) + (getEquipBonusStat('bonusCritRate') * 100)).toFixed(1)}%`;
+            document.getElementById('char-stat-critdmg').innerText = `${(100 + (a.fury * 1) + (a.willpower * 0.5) + (getEquipBonusStat('bonusCritDmg') * 100)).toFixed(0)}%`;
+            document.getElementById('char-stat-dmgred').innerText = `${((a.tenacity * 0.001 + getEquipBonusStat('bonusDmgReduction')) * 100).toFixed(1)}%`;
+            document.getElementById('char-stat-reflect').innerText = `${((a.tenacity * 0.0001 + getEquipBonusStat('bonusReflect')) * 100).toFixed(3)}%`;
             document.getElementById('char-stat-skilldmg').innerText = `${(a.agility * 0.1).toFixed(1)}%`;
             document.getElementById('char-stat-mitigation').innerText = `${Math.min(70, a.resistance * 0.1).toFixed(1)}%`;
             
@@ -1586,7 +1614,7 @@
                 } else {
                     el.dataset.filled = "false"; el.className = `equip-slot`;
                     let icon = '💍';
-                    if(slot === 'head') icon = '🪖'; else if (slot === 'shoulders') icon = '🛡️'; else if (slot === 'arms') icon = '🦾'; else if (slot === 'weapon') icon = '⚔️'; else if (slot === 'chest') icon = '🦺'; else if (slot === 'waist') icon = '🪢'; else if (slot === 'legs') icon = '👖'; else if (slot === 'boots') icon = '🥾'; else if (slot === 'necklace') icon = '📿';
+                    if(slot === 'head') icon = '🪖'; else if (slot === 'shoulders') icon = '🛡️'; else if (slot === 'arms') icon = '🦾'; else if (slot === 'weapon') icon = '⚔️'; else if (slot === 'chest') icon = '🦺'; else if (slot === 'waist') icon = '🪢'; else if (slot === 'legs') icon = '👖'; else if (slot === 'boots') icon = '🥾'; else if (slot === 'necklace') icon = '📿'; else if (slot === 'cape') icon = '🧥';
                     el.innerHTML = badge + icon;
                 }
             });
@@ -1676,39 +1704,40 @@
 
             attrDefs.forEach(a => {
                 let currentVal = globalProgression.attributes[a.id] || (a.id === 'devastation' ? 0 : 1);
-                let minVal = a.id === 'devastation' ? 0 : 1;
+                let classId = player.classId || 'warrior';
+                let classBase = getClassBaseAttributes(classId);
+                let minVal = a.id === 'devastation' ? 0 : (classBase[a.id] || 1);
+                let attrCap = getClassAttrCap(classId, a.id);
                 let isDevastation = a.id === 'devastation';
-                let isWillpower = a.id === 'willpower';
                 let cost = isDevastation ? 5 : 1;
 
-                // + button: disabled if can't afford or willpower/devastation is capped
-                let plusDisabled = (player.statPoints < cost) || (isWillpower && currentVal >= WILLPOWER_CAP) || (isDevastation && currentVal >= DEVASTATION_CAP) ? 'disabled' : '';
+                // + button: disabled if can't afford or at cap
+                let plusDisabled = (player.statPoints < cost) || (currentVal >= attrCap) ? 'disabled' : '';
 
                 // +10 button disabled logic
                 let plus10Disabled;
-                if (isWillpower) {
-                    plus10Disabled = (currentVal >= WILLPOWER_CAP || player.statPoints < 1) ? 'disabled' : '';
-                } else if (isDevastation) {
-                    plus10Disabled = (currentVal >= DEVASTATION_CAP || player.statPoints < 50) ? 'disabled' : '';
+                if (isDevastation) {
+                    plus10Disabled = (currentVal >= attrCap || player.statPoints < 50) ? 'disabled' : '';
                 } else {
-                    let plus10Cost = isDevastation ? 50 : 10;
-                    plus10Disabled = player.statPoints < plus10Cost ? 'disabled' : '';
+                    plus10Disabled = (currentVal >= attrCap || player.statPoints < 10) ? 'disabled' : '';
                 }
 
-                // - button: disabled if at minimum
+                // - button: disabled if at class minimum (permanent base)
                 let minusDisabled = currentVal <= minVal ? 'disabled' : '';
 
                 // -10 button: disabled if fewer than 10 levels above minimum
                 let minus10Disabled = (currentVal - 10) < minVal ? 'disabled' : '';
 
-                let levelDisplay = isWillpower ? `Lv. ${currentVal} / ${WILLPOWER_CAP}` : (isDevastation ? `Lv. ${currentVal} / ${DEVASTATION_CAP}` : `Lv. ${currentVal}`);
+                let capDisplay = attrCap < 9999 ? ` / ${attrCap}` : '';
+                let levelDisplay = isDevastation ? `Lv. ${currentVal} / ${DEVASTATION_CAP}` : `Lv. ${currentVal}${capDisplay}`;
+                let baseNote = (minVal > 1) ? ` <span class="text-yellow-500 text-[9px]">(base ${minVal})</span>` : '';
 
                 let btn = document.createElement('div');
                 btn.className = "flex items-center justify-between bg-gray-900 p-2 rounded-lg border border-gray-700 shadow-sm";
 
                 btn.innerHTML = `
                     <div class="flex-1 min-w-0 mr-2">
-                        <div class="font-bold ${a.color} text-sm">${a.name} <span class="text-white ml-2 text-xs">${levelDisplay}</span></div>
+                        <div class="font-bold ${a.color} text-sm">${a.name} <span class="text-white ml-2 text-xs">${levelDisplay}</span>${baseNote}</div>
                         <div class="text-[10px] text-gray-400 leading-tight mt-0.5">${a.desc}</div>
                     </div>
                     <div class="flex gap-1 items-center flex-shrink-0">
@@ -1726,15 +1755,11 @@
 
         function allocateAttribute(id, count) {
             count = count || 1;
+            let classId = player.classId || 'warrior';
             let cost = id === 'devastation' ? 5 : 1;
+            let attrCap = getClassAttrCap(classId, id);
 
-            if (id === 'willpower') {
-                let currentVal = globalProgression.attributes['willpower'] || 1;
-                let canAllocate = Math.min(count, WILLPOWER_CAP - currentVal, player.statPoints);
-                if (canAllocate <= 0) return;
-                player.statPoints -= canAllocate;
-                globalProgression.attributes['willpower'] = currentVal + canAllocate;
-            } else if (id === 'devastation') {
+            if (id === 'devastation') {
                 let totalCost = 5 * count;
                 let currentDevVal = globalProgression.attributes['devastation'] || 0;
                 let canAllocateDev = Math.min(count, DEVASTATION_CAP - currentDevVal);
@@ -1745,17 +1770,15 @@
                 player.statPoints -= totalCost;
                 globalProgression.attributes['devastation'] = (globalProgression.attributes['devastation'] || 0) + count;
                 ['hp', 'tenacity', 'agility', 'willpower', 'resistance', 'reflexes', 'fury'].forEach(stat => {
-                    if (stat === 'willpower') {
-                        globalProgression.attributes[stat] = Math.min(WILLPOWER_CAP, (globalProgression.attributes[stat] || 1) + count);
-                    } else {
-                        globalProgression.attributes[stat] = (globalProgression.attributes[stat] || 1) + count;
-                    }
+                    let statCap = getClassAttrCap(classId, stat);
+                    globalProgression.attributes[stat] = Math.min(statCap, (globalProgression.attributes[stat] || 1) + count);
                 });
             } else {
-                let totalCost = cost * count;
-                if (player.statPoints < totalCost) return;
-                player.statPoints -= totalCost;
-                globalProgression.attributes[id] = (globalProgression.attributes[id] || 1) + count;
+                let currentVal = globalProgression.attributes[id] || 1;
+                let canAllocate = Math.min(count, attrCap - currentVal, Math.floor(player.statPoints / cost));
+                if (canAllocate <= 0) return;
+                player.statPoints -= canAllocate * cost;
+                globalProgression.attributes[id] = currentVal + canAllocate;
             }
 
             player.maxHp = calculateMaxHp(); player.currentHp = player.maxHp;
@@ -1766,7 +1789,9 @@
 
         function deallocateAttribute(id, count) {
             count = count || 1;
-            let minVal = id === 'devastation' ? 0 : 1;
+            let classId = player.classId || 'warrior';
+            let classBase = getClassBaseAttributes(classId);
+            let minVal = id === 'devastation' ? 0 : (classBase[id] || 1);
             let currentVal = globalProgression.attributes[id] || minVal;
             let canRemove = Math.min(count, currentVal - minVal);
             if (canRemove <= 0) return;
@@ -1775,7 +1800,8 @@
                 player.statPoints += canRemove * 5;
                 globalProgression.attributes['devastation'] = currentVal - canRemove;
                 ['hp', 'tenacity', 'agility', 'willpower', 'resistance', 'reflexes', 'fury'].forEach(stat => {
-                    globalProgression.attributes[stat] = Math.max(1, (globalProgression.attributes[stat] || 1) - canRemove);
+                    let statMin = classBase[stat] || 1;
+                    globalProgression.attributes[stat] = Math.max(statMin, (globalProgression.attributes[stat] || 1) - canRemove);
                 });
             } else {
                 player.statPoints += canRemove;
@@ -1789,13 +1815,16 @@
         }
 
         function respecAttributes() {
+            let classId = player.classId || 'warrior';
+            let classBase = getClassBaseAttributes(classId);
             const normalAttrs = ['hp', 'tenacity', 'agility', 'willpower', 'resistance', 'reflexes', 'fury'];
             let devVal = globalProgression.attributes['devastation'] || 0;
             let totalRefund = devVal * 5;
             normalAttrs.forEach(stat => {
                 let currentVal = globalProgression.attributes[stat] || 1;
-                totalRefund += Math.max(0, currentVal - 1 - devVal);
-                globalProgression.attributes[stat] = 1;
+                let baseVal = classBase[stat] || 1;
+                totalRefund += Math.max(0, currentVal - baseVal - devVal);
+                globalProgression.attributes[stat] = baseVal;
             });
             globalProgression.attributes['devastation'] = 0;
             player.statPoints += totalRefund;
@@ -1807,6 +1836,10 @@
 
         // --- EQUIPMENT UI ---
         let activeEquipSlot = null;
+        function renderBonusStatsHtml(bonusStats) {
+            if (!bonusStats || bonusStats.length === 0) return '';
+            return '<div class="text-[10px] text-cyan-300 mt-0.5">' + bonusStats.map(bs => `+${bs.label}`).join(' | ') + '</div>';
+        }
         function openEquipModal(slot) {
             activeEquipSlot = slot;
             let baseSlotType = slot.startsWith('ring') ? 'ring' : slot;
@@ -1823,7 +1856,8 @@
                 let eqCard = document.createElement('div');
                 eqCard.className = `bg-gray-800 border-2 rarity-${currentEq.rarity} p-3 rounded-lg flex justify-between items-center mb-2`;
                 let enchTxt = currentEq.enchanted ? `<span class="text-yellow-300 ml-1 text-xs">(${currentEq.enchanted})</span>` : '';
-                eqCard.innerHTML = `<div class="flex items-center gap-2"><span class="text-2xl">${currentEq.icon}</span><div><div class="font-bold text-white">${currentEq.name} ${enchTxt} <span class="text-[10px] text-gray-500 uppercase">${currentEq.rarity}</span></div><div class="text-xs text-green-400">HP +${currentEq.stats.hp} | DMG +${currentEq.stats.dmg} | DEF +${currentEq.stats.def}</div></div></div><button onclick="unequipCurrent()" class="bg-red-900 hover:bg-red-800 text-red-200 px-3 py-2 rounded text-xs font-bold transition active:scale-95 border border-red-700">Unequip</button>`;
+                let bonusTxt = renderBonusStatsHtml(currentEq.bonusStats);
+                eqCard.innerHTML = `<div class="flex items-center gap-2"><span class="text-2xl">${currentEq.icon}</span><div><div class="font-bold text-white">${currentEq.name} ${enchTxt} <span class="text-[10px] text-gray-500 uppercase">${currentEq.rarity}</span></div><div class="text-xs text-green-400">HP +${currentEq.stats.hp} | DMG +${currentEq.stats.dmg} | DEF +${currentEq.stats.def}</div>${bonusTxt}</div></div><button onclick="unequipCurrent()" class="bg-red-900 hover:bg-red-800 text-red-200 px-3 py-2 rounded text-xs font-bold transition active:scale-95 border border-red-700">Unequip</button>`;
                 eqSection.appendChild(eqCard);
             } else {
                 eqSection.innerHTML += `<div class="text-gray-400 text-center py-2 text-sm italic bg-gray-900 rounded-lg">Nothing Equipped</div>`;
@@ -1846,8 +1880,9 @@
                     
                     let upgradeBadge = isUpgrade ? `<span class="absolute -top-2 -left-2 bg-green-600 text-white text-[10px] px-1 rounded shadow border border-green-400 font-bold tracking-widest">UPGRADE</span>` : '';
                     let enchTxt = item.enchanted ? `<span class="text-yellow-300 ml-1 text-xs">(${item.enchanted})</span>` : '';
+                    let bonusTxt = renderBonusStatsHtml(item.bonusStats);
                     
-                    btn.innerHTML = `${upgradeBadge}<div class="flex items-center gap-2"><span class="text-2xl">${item.icon || '📦'}</span><div><div class="font-bold text-white">${item.name} ${enchTxt} <span class="text-[10px] text-gray-500 uppercase">${item.rarity}</span></div><div class="text-xs text-green-400">HP +${item.stats.hp} | DMG +${item.stats.dmg} | DEF +${item.stats.def}</div></div></div><button class="bg-blue-800 hover:bg-blue-700 text-blue-200 px-4 py-2 rounded text-xs font-bold border border-blue-600 transition active:scale-95">Equip</button>`;
+                    btn.innerHTML = `${upgradeBadge}<div class="flex items-center gap-2"><span class="text-2xl">${item.icon || '📦'}</span><div><div class="font-bold text-white">${item.name} ${enchTxt} <span class="text-[10px] text-gray-500 uppercase">${item.rarity}</span></div><div class="text-xs text-green-400">HP +${item.stats.hp} | DMG +${item.stats.dmg} | DEF +${item.stats.def}</div>${bonusTxt}</div></div><button class="bg-blue-800 hover:bg-blue-700 text-blue-200 px-4 py-2 rounded text-xs font-bold border border-blue-600 transition active:scale-95">Equip</button>`;
                     btn.onclick = (e) => { if(e.target.tagName !== 'BUTTON') return; equipItem(item.id); }; 
                     invSection.appendChild(btn);
                 });
@@ -1910,9 +1945,19 @@
         }
 
         function rollEquipment(forcedRarity = null) {
-            let slotTypes = ['head', 'shoulders', 'chest', 'arms', 'waist', 'legs', 'boots', 'necklace', 'ring', 'weapon'];
+            let slotTypes = ['head', 'shoulders', 'chest', 'arms', 'waist', 'legs', 'boots', 'necklace', 'ring', 'weapon', 'cape'];
             let sType = slotTypes[Math.floor(Math.random() * slotTypes.length)];
             
+            // Class-specific weapons
+            if (sType === 'weapon') {
+                let classId = player ? player.classId : 'warrior';
+                if (classId === 'warrior') {
+                    // Warriors only get Axes
+                } else if (classId === 'mage') {
+                    // Mages only get Staffs
+                }
+            }
+
             let r = 'common';
             if (forcedRarity) { r = forcedRarity; } 
             else {
@@ -1925,19 +1970,89 @@
             let mult = RARITY_MULTS[r]; 
             let totalPts = player.lvl * mult;
 
+            // Class-specific weapon naming
+            let weaponName = '⚔️';
+            let weaponIcon = '⚔️';
+            if (sType === 'weapon') {
+                let classId = player ? player.classId : 'warrior';
+                if (classId === 'warrior') { weaponName = 'Axe'; weaponIcon = '🪓'; }
+                else if (classId === 'mage') { weaponName = 'Staff'; weaponIcon = '🪄'; }
+                else { weaponName = 'Sword'; weaponIcon = '⚔️'; }
+            }
+
             let e = {
-                id: 'eq_' + Date.now() + Math.floor(Math.random()*1000), type: sType, rarity: r, name: `${r.toUpperCase()} ${sType}`,
-                icon: sType==='head'?'🪖':sType==='shoulders'?'🛡️':sType==='chest'?'🦺':sType==='arms'?'🦾':sType==='waist'?'🪢':sType==='legs'?'👖':sType==='boots'?'🥾':sType==='necklace'?'📿':sType==='ring'?'💍':'⚔️',
+                id: 'eq_' + Date.now() + Math.floor(Math.random()*1000), type: sType, rarity: r, 
+                name: sType === 'weapon' ? `${r.toUpperCase()} ${weaponName}` : `${r.toUpperCase()} ${sType}`,
+                icon: sType==='head'?'🪖':sType==='shoulders'?'🛡️':sType==='chest'?'🦺':sType==='arms'?'🦾':sType==='waist'?'🪢':sType==='legs'?'👖':sType==='boots'?'🥾':sType==='necklace'?'📿':sType==='ring'?'💍':sType==='cape'?'🧥':weaponIcon,
                 stats: { hp: 0, dmg: 0, def: 0 },
+                bonusStats: [],
                 enchanted: false
             };
+            // Override weapon icon
+            if (sType === 'weapon') e.icon = weaponIcon;
             
             if (sType === 'weapon') { e.stats.dmg = totalPts; }
             else if (sType === 'chest' || sType === 'legs') { e.stats.hp = totalPts * 5; e.stats.def = Math.ceil(totalPts * 0.2); }
+            else if (sType === 'cape') { e.stats.hp = totalPts * 3; e.stats.def = Math.ceil(totalPts * 0.3); }
             else if (sType === 'head' || sType === 'shoulders' || sType === 'boots' || sType === 'arms' || sType === 'waist') { e.stats.hp = totalPts * 2; e.stats.def = Math.ceil(totalPts * 0.5); }
             else if (sType === 'necklace' || sType === 'ring') { e.stats.dmg = Math.ceil(totalPts * 0.5); e.stats.hp = totalPts; }
 
+            // Generate random bonus stats
+            e.bonusStats = generateBonusStats(r, player.lvl);
+
             return e;
+        }
+
+        // Generate random bonus stats for equipment
+        function generateBonusStats(rarity, lvl) {
+            let pool = [
+                { stat: 'bonusHp', label: 'HP' },
+                { stat: 'bonusDmgReduction', label: '0.1% Dmg Reduction' },
+                { stat: 'bonusAtk', label: 'Attack Damage' },
+                { stat: 'bonusCritRate', label: '0.1% Crit Rate' },
+                { stat: 'bonusCritDmg', label: '0.1% Crit Damage' },
+                { stat: 'bonusReflect', label: '0.01% Reflect' },
+                { stat: 'bonusHpRegen', label: '0.01% HP Regen' },
+                { stat: 'bonusDodge', label: '0.1% Dodge' },
+                { stat: 'bonusHit', label: '0.1% Hit' }
+            ];
+            let lvlScale = 1 + (lvl - 1) * 0.05; // 5% increase per level
+            let numStats = rarity === 'legendary' ? 4 : rarity === 'epic' ? 3 : rarity === 'rare' ? 2 : 1;
+            let result = [];
+            let available = pool.slice();
+            for (let i = 0; i < numStats; i++) {
+                if (available.length === 0) break;
+                let idx = Math.floor(Math.random() * available.length);
+                let chosen = available.splice(idx, 1)[0];
+                let value = 0;
+                if (chosen.stat === 'bonusHp') value = Math.ceil(lvl * 2 * lvlScale);
+                else if (chosen.stat === 'bonusDmgReduction') value = 0.001 * lvlScale;
+                else if (chosen.stat === 'bonusAtk') value = Math.ceil(lvl * 0.3 * lvlScale);
+                else if (chosen.stat === 'bonusCritRate') value = 0.001 * lvlScale;
+                else if (chosen.stat === 'bonusCritDmg') value = 0.001 * lvlScale;
+                else if (chosen.stat === 'bonusReflect') value = 0.0001 * lvlScale;
+                else if (chosen.stat === 'bonusHpRegen') value = 0.0001 * lvlScale;
+                else if (chosen.stat === 'bonusDodge') value = 0.001 * lvlScale;
+                else if (chosen.stat === 'bonusHit') value = 0.001 * lvlScale;
+                result.push({ stat: chosen.stat, value: value, label: chosen.label });
+            }
+            // Rarity-based skill cooldown reduction
+            if (rarity === 'rare') result.push({ stat: 'bonusCdReduc', value: 1, label: 'Reduce Skill CD by 1 turn' });
+            else if (rarity === 'epic') result.push({ stat: 'bonusCdReduc', value: 2, label: 'Reduce Skill CD by 2 turns' });
+            else if (rarity === 'legendary') result.push({ stat: 'bonusCdReduc', value: 3, label: 'Reduce Skill CD by 3 turns' });
+            return result;
+        }
+
+        // Sum a specific bonus stat from all equipped items
+        function getEquipBonusStat(statName) {
+            let total = 0;
+            if (!globalProgression.equipped) return total;
+            Object.values(globalProgression.equipped).forEach(item => {
+                if (item && item.bonusStats) {
+                    item.bonusStats.forEach(bs => { if (bs.stat === statName) total += bs.value; });
+                }
+            });
+            return total;
         }
 
         // --- SKILL UI ---
@@ -2627,7 +2742,7 @@
             globalProgression.gold -= 20;
             globalProgression.wellXpBattles = 10;
             globalProgression.wellLastXpDate = today;
-            log.innerText = '2x XP blessing is active for 10 battles!';
+            log.innerText = '5x XP blessing is active for 10 battles!';
             playSound('win');
             saveGame();
             showWell();
@@ -2641,7 +2756,7 @@
             globalProgression.gold -= 20;
             globalProgression.wellDropBattles = 10;
             globalProgression.wellLastDropDate = today;
-            log.innerText = '2x drop blessing is active for 10 battles!';
+            log.innerText = '5x drop blessing is active for 10 battles!';
             playSound('win');
             saveGame();
             showWell();
@@ -2770,14 +2885,16 @@
             if(buyBtn) { buyBtn.disabled = globalProgression.gold < 100; if(globalProgression.gold < 100) buyBtn.classList.add('opacity-50'); else buyBtn.classList.remove('opacity-50'); }
             const list = document.getElementById('dungeon-list'); list.innerHTML = '';
             
-            let currentUnlocked = globalProgression.dungeonTier;
-            let minShow = Math.max(1, currentUnlocked - 4);
-            let maxShow = currentUnlocked + 1;
+            // Show max 5 dungeons: up to 4 unlocked + 1 locked (next tier)
+            // Sliding window: once 6th tier unlocks, the 1st is erased
+            let maxShow = globalProgression.dungeonTier + 1; // next locked tier
+            let minShow = Math.max(1, maxShow - 4); // at most 5 total
             
             for(let i = minShow; i <= maxShow; i++) {
-                let isLocked = i > globalProgression.dungeonTier; let btn = document.createElement('button');
+                let isLocked = i > globalProgression.dungeonTier;
+                let btn = document.createElement('button');
                 btn.className = `p-4 rounded-xl border flex justify-between items-center transition ${isLocked ? 'bg-gray-900 border-gray-800 opacity-70 cursor-not-allowed' : 'bg-gray-800 border-red-900 hover:border-red-500 active:scale-95 shadow-lg'}`; btn.disabled = isLocked;
-                btn.innerHTML = `<div class="text-left"><div class="font-bold text-lg ${isLocked ? 'text-gray-500' : 'text-red-400'}">Tier ${i} Portal</div><div class="text-xs text-gray-400">${isLocked ? 'Defeat previous boss to unlock' : `Lvl ${1+(i-1)*5} - ${5+(i-1)*5}`}</div></div><div class="text-2xl">${isLocked ? '🔒' : '🌌'}</div>`;
+                btn.innerHTML = `<div class="text-left"><div class="font-bold text-lg ${isLocked ? 'text-gray-500' : 'text-red-400'}">Tier ${i} Portal</div><div class="text-xs text-gray-400">${isLocked ? 'Defeat previous boss to unlock' : `Lvl ${1+(i-1)*5} - ${5+(i-1)*5} · 5 Rooms · 1.5x Harder`}</div></div><div class="text-2xl">${isLocked ? '🔒' : '🌌'}</div>`;
                 if(!isLocked) { btn.onclick = () => { if(globalProgression.tickets > 0) { globalProgression.tickets--; currentMode = 'dungeon'; activeDungeonTier = i; activeDungeonRoom = 1; startBattle(true); } else { alert("You need a Dungeon Ticket from the Shop!"); } }; } list.appendChild(btn);
             }
             switchScreen('screen-dungeons');
@@ -2932,8 +3049,8 @@
                     e.lvl = activeDungeonTier * 5; 
                     let dBoss = BOSS_TEMPLATES['dungeon'][Math.floor(Math.random() * BOSS_TEMPLATES['dungeon'].length)];
                     e.name = dBoss.name; e.avatar = dBoss.avatar;
-                    e.maxHp = Math.floor(150 * activeDungeonTier * dBoss.hpMult); 
-                    e.baseDmg = e.lvl * 3 * dBoss.dmgMult;
+                    e.maxHp = Math.floor(150 * activeDungeonTier * dBoss.hpMult * 1.5); 
+                    e.baseDmg = e.lvl * 3 * dBoss.dmgMult * 1.5;
                     e.rarity = 'boss'; e.isBoss = true;
                     e.templateMults = { hpMult: dBoss.hpMult, dmgMult: dBoss.dmgMult };
                 } else if (isBossFight) {
@@ -2960,8 +3077,9 @@
                     if (e.rarity !== 'common') { e.name = `${e.rarity.charAt(0).toUpperCase() + e.rarity.slice(1)} ${e.name}`; }
 
                     let rMult = RARITY_MULTS[e.rarity] || 1;
-                    e.maxHp = Math.max(1, Math.floor(25 * t.hpMult * (1 + (e.lvl - 1) * 0.4) * rMult)); 
-                    e.baseDmg = Math.max(1, e.lvl * rMult); 
+                    let dungeonMult = currentMode === 'dungeon' ? 1.5 : 1;
+                    e.maxHp = Math.max(1, Math.floor(25 * t.hpMult * (1 + (e.lvl - 1) * 0.4) * rMult * dungeonMult)); 
+                    e.baseDmg = Math.max(1, e.lvl * rMult * dungeonMult); 
                 }
 
                 assignEnemySkills(e);
@@ -3027,7 +3145,7 @@
             if(!cont) return;
             cont.innerHTML = '';
             if(!player.equippedUsables) player.equippedUsables = [null, null, null, null, null, null, null, null];
-            let numUnlocked = Math.min(8, 1 + Math.floor((player.lvl - 1) / 5));
+            let numUnlocked = Math.min(8, Math.floor(player.lvl / 4));
             for(let i = 0; i < 8; i++) {
                 let btn = document.createElement('div');
                 btn.style.cssText = 'width:40px;height:40px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;flex-shrink:0;position:relative;';
@@ -3272,7 +3390,7 @@
         function processRegenAndBuffs() {
             let healMult = player.activeBuffs.some(b => b.type === 'poison') ? 0.5 : 1.0;
             let a = globalProgression.attributes;
-            let hpRegenAmt = Math.floor(player.maxHp * (a.hp * 0.0001));
+            let hpRegenAmt = Math.floor(player.maxHp * (a.hp * 0.0001 + getEquipBonusStat('bonusHpRegen')));
             let treeRegen = Math.floor(((player.treeBonusRegen || 0) + hpRegenAmt) * healMult);
             
             if (treeRegen > 0 && player.currentHp < player.maxHp) {
@@ -3372,7 +3490,7 @@
 
                         setTimeout(() => triggerAnim(`enemy-card-${tIdx}`, 'anim-shake'), 150 * (i+1));
                         
-                        let hitChance = 0.95 + (a.reflexes * 0.001);
+                        let hitChance = 0.95 + (a.reflexes * 0.001) + getEquipBonusStat('bonusHit');
                         if(target.dodgeTurns > 0 || Math.random() > hitChance) {
                             addLog(`Missed ${target.name}!`, "text-gray-500");
                             showFloatText(`enemy-card-${tIdx}`, `MISS`, 'text-gray-400');
@@ -3389,17 +3507,18 @@
 
                         if (target.shield > 0) { hitDmg = Math.floor(hitDmg * (1 - target.shield)); target.shield = 0; }
                         
-                        let critChance = Math.min(0.75, 0.05 + (a.reflexes * 0.01));
+                        let critChance = Math.min(0.75, (a.reflexes * 0.01) + getEquipBonusStat('bonusCritRate'));
                         let isCrit = Math.random() < critChance;
                         if(isCrit) {
-                            let critMult = (150 + (a.fury * 1) + (a.willpower * 0.5)) / 100;
+                            let critMult = (100 + (a.fury * 1) + (a.willpower * 0.5) + (getEquipBonusStat('bonusCritDmg') * 100)) / 100;
                             hitDmg = Math.floor(hitDmg * critMult);
                             addLog(`CRITICAL HIT!`, "text-yellow-400 font-bold");
+                            playSound('crit');
                         }
                         
                         target.currentHp -= Math.max(1, hitDmg); 
                         totalDmg += hitDmg;
-                        showFloatText(`enemy-card-${tIdx}`, `-${hitDmg}`, `text-dmg-green font-bold ${isCrit ? 'text-2xl drop-shadow-[0_0_5px_#39ff14]' : ''}`);
+                        showFloatText(`enemy-card-${tIdx}`, `-${hitDmg}`, isCrit ? 'text-orange-400 font-black text-2xl drop-shadow-[0_0_8px_rgba(251,146,60,0.9)]' : 'text-yellow-300 font-bold');
 
                         if(skill.effect) {
                             if(skill.effect.bleed) {
@@ -3447,7 +3566,9 @@
                 }
             }
 
-            player.skillCooldowns[skillIdx] = skill.cd + 1; 
+            // Apply equipment skill cooldown reduction
+            let cdReduc = Math.floor(getEquipBonusStat('bonusCdReduc'));
+            player.skillCooldowns[skillIdx] = Math.max(0, skill.cd + 1 - cdReduc); 
             updateCombatUI(); renderSkills();
             
             let enemyDelay = currentMode === 'quest' ? 200 : 800;
@@ -3553,8 +3674,12 @@
             else { // hit
                 playSound('hit'); triggerAnim(`enemy-card-${enemyIdx}`, 'anim-strike'); setTimeout(() => triggerAnim('combat-player-avatar', 'anim-shake'), 150);
                 let dmg = Math.floor(e.baseDmg * (0.8 + Math.random() * 0.4));
-                dealDamageToPlayer(dmg, e);
-                addLog(`${e.name} hits for ${dmg} dmg!`, "text-red-400 font-bold"); 
+                // Enemy crit chance: 5% base
+                let eCritChance = 0.05 + (e.isBoss ? 0.05 : 0);
+                let eCrit = Math.random() < eCritChance;
+                if (eCrit) { dmg = Math.floor(dmg * 1.5); playSound('crit'); }
+                dealDamageToPlayer(dmg, e, eCrit);
+                addLog(`${e.name} hits for ${dmg} dmg${eCrit ? ' (CRIT!)' : ''}!`, eCrit ? "text-red-300 font-black" : "text-red-400 font-bold"); 
                 e.cooldowns['hit'] = 0;
             }
 
@@ -3566,9 +3691,9 @@
             }
         }
 
-        function dealDamageToPlayer(baseDmg, attackerEnemy) {
+        function dealDamageToPlayer(baseDmg, attackerEnemy, isCritHit = false) {
             let a = globalProgression.attributes;
-            let dodgeChance = a.resistance * 0.001;
+            let dodgeChance = a.resistance * 0.001 + getEquipBonusStat('bonusDodge');
             if(player.dodgeTurns > 0 || Math.random() < dodgeChance) {
                 addLog(`You dodged!`, "text-gray-400 font-bold");
                 showFloatText('player-avatar-container', `DODGE`, 'text-gray-400');
@@ -3589,7 +3714,7 @@
             let buffDefMult = 1.0; 
             if (player.activeBuffs) player.activeBuffs.filter(b => b.type === 'def' || b.type === 'def_down').forEach(b => buffDefMult *= b.val);
             
-            let tenacityReduction = 1 - (a.tenacity * 0.001);
+            let tenacityReduction = 1 - (a.tenacity * 0.001 + getEquipBonusStat('bonusDmgReduction'));
             let dmg = Math.floor(baseDmg * tenacityReduction);
             
             // Divine Shield enhancement
@@ -3618,10 +3743,20 @@
             }
             
             player.currentHp -= dmg;
-            showFloatText('player-avatar-container', `-${dmg}`, 'text-red-500');
+            // Crit received: larger, more vigorous animation and sound
+            if (isCritHit) {
+                showFloatText('player-avatar-container', `-${dmg} CRIT!`, 'text-red-400 font-black text-2xl drop-shadow-[0_0_10px_rgba(239,68,68,0.9)]');
+                triggerAnim('combat-player-avatar', 'anim-crit');
+                playSound('crit');
+                // Extra screen shake for received crit
+                let screen = document.getElementById('screen-combat');
+                if(screen) { screen.classList.add('screen-shake'); setTimeout(() => screen.classList.remove('screen-shake'), 500); }
+            } else {
+                showFloatText('player-avatar-container', `-${dmg}`, 'text-red-500');
+            }
 
             // Reflect
-            let reflectPct = a.tenacity * 0.0001;
+            let reflectPct = a.tenacity * 0.0001 + getEquipBonusStat('bonusReflect');
             let fireShieldActive = player.activeBuffs && player.activeBuffs.some(b => b.type === 'fire_shield');
             if(fireShieldActive) reflectPct += 0.01;
 
@@ -3828,7 +3963,9 @@
                     }
                 });
                 
-                if((globalProgression.wellXpBattles || 0) > 0) totalXp *= 2;
+                if((globalProgression.wellXpBattles || 0) > 0) totalXp *= 5;
+                // Dungeons give 3x XP
+                if(currentMode === 'dungeon') totalXp *= 3;
                 // Apply XP Increase enhancements
                 let xpMult = 1;
                 (globalProgression.skillTreeEnhancements || []).forEach(enh => {
