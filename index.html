@@ -1982,14 +1982,14 @@
             // Stat pool (base values are in their natural decimal/flat forms for combat use)
             let statPool = [
                 { stat: 'health',          getValue: (l, m) => Math.round((3 + l * 0.5) * m) },
-                { stat: 'damageReduction', getValue: (l, m) => Math.round(0.001 * m * 1000) / 1000 },
+                { stat: 'damageReduction', getValue: (l, m) => m * 0.001 },
                 { stat: 'attackDamage',    getValue: (l, m) => Math.round((1 + l * 0.2) * m) },
-                { stat: 'critRate',        getValue: (l, m) => Math.round(0.001 * m * 1000) / 1000 },
-                { stat: 'critDamage',      getValue: (l, m) => Math.round(0.001 * m * 1000) / 1000 },
-                { stat: 'reflect',         getValue: (l, m) => Math.round(0.0001 * m * 10000) / 10000 },
-                { stat: 'hpRegen',         getValue: (l, m) => Math.round(0.0001 * m * 10000) / 10000 },
-                { stat: 'dodge',           getValue: (l, m) => Math.round(0.001 * m * 1000) / 1000 },
-                { stat: 'hit',             getValue: (l, m) => Math.round(0.001 * m * 1000) / 1000 },
+                { stat: 'critRate',        getValue: (l, m) => m * 0.001 },
+                { stat: 'critDamage',      getValue: (l, m) => m * 0.001 },
+                { stat: 'reflect',         getValue: (l, m) => m * 0.0001 },
+                { stat: 'hpRegen',         getValue: (l, m) => m * 0.0001 },
+                { stat: 'dodge',           getValue: (l, m) => m * 0.001 },
+                { stat: 'hit',             getValue: (l, m) => m * 0.001 },
             ];
             // Rarity-specific skill CD reduction (only one per rarity)
             if (r === 'rare')      statPool.push({ stat: 'skillCdReduction', getValue: () => 1 });
